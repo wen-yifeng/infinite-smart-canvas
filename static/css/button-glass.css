@@ -1,0 +1,602 @@
+/* CURRENT_SMART_CANVAS_BUTTON_GLASS_20260731
+   Active shared glass button system only. Historical phases and superseded declarations removed. */
+/* SHARED_MOTHER_GLASS_BUTTON_SYSTEM_20260808
+   Single source of truth for every button on every page.
+   The material below is the shortcut card's keycap layer, copied verbatim.
+   Path C: the historical `backdrop-filter:none!important` base is gone, so
+   page-level mother-material mappings are no longer overwritten by this file. */
+:root{
+  --av-space-00:#070809;
+  --av-glass-x:50%;
+  --av-glass-y:0%;
+  --av-ease:cubic-bezier(.2,.8,.2,1);
+
+  /* Mother material tokens. Page copies (--shortcut-mother-*, --home-shortcut-mother-*,
+     --api-mother-*) intentionally hold the same values; these are the shared fallback. */
+  --av-mother-edge:rgba(245,252,249,.062);
+  --av-mother-surface:radial-gradient(ellipse 12px 66% at 0 0,rgba(0,0,0,.29),rgba(0,0,0,.12) 44%,transparent 100%),
+        radial-gradient(ellipse 18% 50% at 101% 72%,rgba(211,239,229,.095),transparent 76%),
+        radial-gradient(ellipse 64% 9% at 78% 101%,rgba(237,248,243,.21),rgba(179,226,214,.050) 44%,transparent 80%),
+        radial-gradient(ellipse 38% 10% at 14% 0%,var(--white-a9),transparent 74%),
+        radial-gradient(ellipse 42% 27% at 103% 102%,rgba(179,225,213,.070),transparent 74%),
+        linear-gradient(153deg,rgba(31,35,37,.20) 0%,rgba(11,14,16,.24) 38%,rgba(4,6,8,.33) 100%);
+  --av-mother-shadow:0 40px 96px rgba(0,0,0,.66),
+        0 12px 34px var(--black-a34),
+        inset 0 1px 0 rgba(255,255,255,.17),
+        inset 1px 0 0 rgba(239,250,246,.042),
+        inset 0 2px 0 rgba(0,0,0,.24),
+        inset 2px 0 0 rgba(0,0,0,.14),
+        inset 0 5px 0 rgba(235,250,244,.028),
+        inset 0 10px 15px rgba(232,248,241,.042),
+        inset 6px 0 11px rgba(211,240,231,.028),
+        inset -1px 0 0 rgba(202,231,221,.070),
+        inset 0 -2px 0 rgba(223,242,233,.14),
+        inset 0 -7px 12px rgba(184,228,216,.030),
+        inset 0 0 24px rgba(218,242,234,.030),
+        inset 1px 0 0 rgba(232,249,242,.050),
+        inset 3px 0 0 rgba(0,0,0,.12),
+        inset 6px 0 10px rgba(211,241,231,.038);
+  --av-mother-tool: var(--av-mother-surface);
+  --av-mother-tool-hover: var(--av-mother-surface);
+  --av-mother-tool-shadow: var(--av-mother-shadow);
+  --av-mother-control: var(--av-mother-surface);
+  --av-mother-control-hover: var(--av-mother-surface);
+  --av-mother-control-shadow: var(--av-mother-shadow);
+  --av-mother-control-hover-shadow: var(--av-mother-shadow);
+  --av-mother-panel-filter:blur(18px) saturate(1.18) brightness(1.04) contrast(1.04);
+  --av-mother-tool-filter:none!important;
+  --av-mother-control-filter:none!important;
+  /* 实际层级差异变量 - 2026-08-14 新增 */
+  --av-mother-control-light-filter: blur(12px) saturate(.92);      /* 轻量 Control（12px模糊） */
+  --av-mother-compact-filter: blur(10px);                           /* Compact 层（10px模糊） */
+  --av-mother-nested-filter: blur(8px);                             /* 最小嵌套层（8px模糊） */
+  /* 特殊场景材质变量 */
+  --av-mother-saturated-filter: blur(16px) saturate(112%);                   /* 高饱和材质 */
+  --av-mother-ultra-deep-filter: blur(48px) saturate(1.12) brightness(.88);     /* 极深模态背景（Composer下游锁定） */
+  --av-mother-panel-desaturated-filter: blur(27px) saturate(.78) brightness(.96); /* 核心面板降饱和材质 */
+  --av-mother-panel-thin-filter: blur(24px) saturate(1.14) brightness(.97);     /* 薄面板层材质 */
+  --av-mother-desaturated-filter: blur(10px) saturate(.78);                  /* 低饱和材质 */
+  --av-mother-text:rgba(238,244,240,.82);
+  --av-mother-text-strong:rgba(249,252,250,.96);
+  --av-mother-danger:rgba(255,157,169,.84);
+
+  /* Compact mother surface for controls nested inside a glass panel. */
+  --av-mother-surface-compact: var(--av-mother-surface);
+  --av-mother-surface-compact-hover: var(--av-mother-surface);
+  --av-mother-nested-shadow: var(--av-mother-shadow);
+  --av-mother-nested-shadow-hover: var(--av-mother-shadow);
+
+  --av-text:var(--av-mother-text-strong);
+  --av-muted:#a3a4a1;
+  --av-glass-line:var(--white-a9);
+  --av-glass-line-hover:var(--white-a14);
+  --av-glass-control:var(--white-a6);
+  --av-glass-control-deep:rgba(10,11,13,.18);
+  --av-control-shadow:var(--av-mother-control-shadow);
+  --av-control-shadow-hover:var(--av-mother-control-hover-shadow);
+
+  /* Semantic tone tokens for danger/save/active states across all tiers */
+  --av-danger-copy:rgba(254,202,202,.96);
+  --av-danger-edge:rgba(248,113,113,.44);
+  --av-save-copy:rgba(209,250,229,.96);
+  --av-save-edge:rgba(52,211,153,.44);
+}
+/* Base: every ordinary button uses the same compact mother surface as the
+   approved Composer controls. Material is shared; only depth separates tiers,
+   so ordinary buttons take the control shadow and Tier A takes the nested one.
+   Page rules may still vary geometry and semantic color. */
+:root body button:not(.run-btn):not(.downstream-prompt-lock):not(.glass-select-trigger):not(.asset-select-trigger),
+:root body input[type="button"],
+:root body input[type="reset"],
+:root body input[type="submit"]{
+  color:var(--av-mother-text)!important;
+  border:0!important;
+  outline:1px solid var(--av-mother-edge)!important;
+  outline-offset:-1px;
+  background:var(--av-mother-surface-compact)!important;
+  background-size:auto;
+  box-shadow:var(--av-mother-control-shadow)!important;
+  -webkit-backdrop-filter:var(--av-mother-control-filter)!important;
+  backdrop-filter:var(--av-mother-control-filter)!important;
+  text-shadow:0 1px 2px var(--black-a38);
+  transition:transform .16s var(--av-ease), outline-color .16s ease, color .16s ease, box-shadow .18s ease, filter .16s ease, background .18s ease!important;
+}
+:root body button:not(.run-btn):not(.downstream-prompt-lock) svg,:root body button:not(.run-btn):not(.downstream-prompt-lock) i{color:currentColor;transition:color .16s ease, filter .16s ease, opacity .16s ease, transform .16s var(--av-ease);}
+:root body button:not(.run-btn):not(.downstream-prompt-lock):hover:not(:disabled),
+:root body input[type="button"]:hover:not(:disabled),
+:root body input[type="submit"]:hover:not(:disabled),
+:root body input[type="reset"]:hover:not(:disabled){
+  color:var(--av-mother-text-strong)!important;
+  transform:translateY(-1px);
+  outline-color:var(--color-f5fcf9-a11)!important;
+  background:var(--av-mother-surface-compact-hover)!important;
+  box-shadow:var(--av-mother-control-hover-shadow)!important;
+}
+:root body button:not(.run-btn):not(.downstream-prompt-lock):hover:not(:disabled) svg,:root body button:not(.run-btn):not(.downstream-prompt-lock):hover:not(:disabled) i{color:var(--white);filter:drop-shadow(0 0 6px var(--white-a22));}
+:root body button:not(.run-btn):not(.downstream-prompt-lock):active:not(:disabled),
+:root body input[type="button"]:active:not(:disabled),
+:root body input[type="submit"]:active:not(:disabled),
+:root body input[type="reset"]:active:not(:disabled){
+  transform:translateY(.75px) scale(.988);
+  outline-color:rgba(245,252,249,.13)!important;
+  box-shadow:inset 0 3px 8px var(--black-a30), inset 0 1px 0 var(--white-a6), 0 1px 3px var(--black-a13)!important;
+}
+:root body button:not(.run-btn):not(.downstream-prompt-lock):focus-visible,
+:root body input[type="button"]:focus-visible,
+:root body input[type="submit"]:focus-visible,
+:root body input[type="reset"]:focus-visible{
+  outline:2px solid rgba(255,255,255,.82)!important;
+  outline-offset:2px!important;
+  box-shadow:0 0 0 3px rgba(183,224,203,.07), var(--av-mother-control-hover-shadow)!important;
+}
+/* Selected / primary states keep the same material and only lift the light. */
+:root body button:not(.run-btn):not(.downstream-prompt-lock).active,
+:root body button:not(.run-btn):not(.downstream-prompt-lock)[aria-pressed="true"],
+:root body button:not(.run-btn):not(.downstream-prompt-lock)[aria-selected="true"],
+:root body button:not(.run-btn):not(.downstream-prompt-lock)[aria-expanded="true"],
+:root body button:not(.run-btn):not(.downstream-prompt-lock).primary,
+:root body button:not(.run-btn):not(.downstream-prompt-lock)[class*="primary" i],
+:root body button:not(.run-btn):not(.downstream-prompt-lock)[class*="save" i],
+:root body input[type="submit"]{
+  color:var(--av-mother-text-strong)!important;
+  outline-color:var(--color-f5fcf9-a11);
+  background:var(--av-mother-surface-compact-hover)!important;
+  box-shadow:var(--av-mother-control-hover-shadow)!important;
+}
+/* Semantic state is restricted to copy, icon and thin edge.
+   Tier A is excluded: its tone is declared with data-av-tone, so a class-name
+   guess must not repaint a top-level button's edge behind the markup's back. */
+:root body button:not(.run-btn):not(.downstream-prompt-lock):not(.image-overlay-control):not([data-av-interaction="top"]).danger,
+:root body button:not(.run-btn):not(.downstream-prompt-lock):not(.image-overlay-control):not([data-av-interaction="top"])[class*="danger" i],
+:root body button:not(.run-btn):not(.downstream-prompt-lock):not(.image-overlay-control):not([data-av-interaction="top"])[class*="delete" i],
+:root body button:not(.run-btn):not(.downstream-prompt-lock):not(.image-overlay-control):not([data-av-interaction="top"])[class*="remove" i],
+:root body button:not(.run-btn):not(.downstream-prompt-lock):not(.image-overlay-control):not([data-av-interaction="top"])[class*="trash" i]{
+  color:var(--av-mother-danger)!important;
+  outline-color:rgba(255,157,169,.24)!important;
+}
+:root body button:not(.run-btn):not(.downstream-prompt-lock):not(.image-overlay-control):not([data-av-interaction="top"]).danger:hover:not(:disabled),
+:root body button:not(.run-btn):not(.downstream-prompt-lock):not(.image-overlay-control):not([data-av-interaction="top"])[class*="danger" i]:hover:not(:disabled),
+:root body button:not(.run-btn):not(.downstream-prompt-lock):not(.image-overlay-control):not([data-av-interaction="top"])[class*="delete" i]:hover:not(:disabled),
+:root body button:not(.run-btn):not(.downstream-prompt-lock):not(.image-overlay-control):not([data-av-interaction="top"])[class*="remove" i]:hover:not(:disabled),
+:root body button:not(.run-btn):not(.downstream-prompt-lock):not(.image-overlay-control):not([data-av-interaction="top"])[class*="trash" i]:hover:not(:disabled){
+  color:rgba(255,205,212,.96)!important;
+  outline-color:rgba(255,170,181,.38)!important;
+}
+:root body button:not(.run-btn):not(.downstream-prompt-lock).is-action-success,
+:root body button:not(.run-btn):not(.downstream-prompt-lock)[class*="success" i]{
+  color:rgba(160,232,196,.92)!important;
+  outline-color:rgba(160,232,196,.22)!important;
+}
+:root body button:not(.run-btn):not(.downstream-prompt-lock):disabled,
+:root body input[type="button"]:disabled,
+:root body input[type="submit"]:disabled,
+:root body input[type="reset"]:disabled{
+  color:rgba(214,214,210,.34);
+  outline-color:rgba(245,252,249,.040);
+  box-shadow:inset 0 1px 0 var(--white-a3), inset 0 -1px 0 var(--black-a16);
+  filter:saturate(.15);
+  text-shadow:none;
+  transform:none!important;
+}
+@media (prefers-reduced-motion:reduce){
+:root body button:not(.run-btn):not(.downstream-prompt-lock):not(.glass-select-trigger):not(.asset-select-trigger),:root body input[type="button"],:root body input[type="submit"],:root body input[type="reset"]{transition:color .01ms linear, border-color .01ms linear, background .01ms linear!important;}
+}
+
+/* 已移除死 html 层色板：这 13 个 token 与 color-scheme 在 <body> 层被 theme.css/body.theme-dark/.theme-dark 覆盖（:has(.workspace) 仅首页命中）。 */
+/* SHARED_MOTHER_GLASS_SURFACES_20260808
+   Path C consolidation. Every page-level surface below previously carried its
+   own hand-tuned opaque gradient from earlier patch rounds. They are now three
+   layers of the one mother material: panel (18px), tool (12px), control (8px).
+   Only page background gradients and semantic color stay page-specific. */
+html.studio-theme-dark:has(.page .layout) body{
+  color-scheme:dark;
+  --panel:rgba(25,26,28,.50);
+  --card:rgba(28,29,31,.52);
+  --soft:rgba(255,255,255,.048);
+  --line:rgba(255,255,255,.105);
+  --line-2:rgba(255,255,255,.18);
+  --text:#f1f1ef;
+  --muted:#aaa9a5;
+  --faint:#797a7d;
+  --accent:#d8d8d4;
+  --strong:#d8d8d4;
+  --strong-text:#17181a;
+  --shadow:var(--black-a30);
+  background:radial-gradient(ellipse 66% 54% at 74% -14%,rgba(171,221,202,.035),transparent 70%),
+        linear-gradient(145deg,#101415,#090c0d 65%,#070909)!important;
+}
+/* A. Panels, sidebars, dialogs and menus: the shortcut outer-card composite. */
+html.studio-theme-dark:has(.page .layout) :is(.sidebar,.content-head,.section,.picker-modal),html.theme-dark:has(.workspace) :is(.ws-sidebar,.ws-trash-head,.ws-trash-panel,.ws-card-pop,.ws-home-sort-menu){
+  border:0!important;
+  outline:1px solid var(--av-mother-edge)!important;
+  outline-offset:-1px;
+  background:var(--av-mother-surface)!important;
+  box-shadow:var(--av-mother-shadow)!important;
+  -webkit-backdrop-filter:var(--av-mother-panel-filter)!important;
+  backdrop-filter:var(--av-mother-panel-filter)!important;
+  color:var(--av-mother-text)!important;
+}
+/* B. Cards and nested groups: the shortcut header-tool layer. */
+html.studio-theme-dark:has(.page .layout) body :is(.block,.key-panel,.model-row,.provider-card),html.theme-dark:has(.workspace) :is(.launcher-world .ws-card,.ws-new-canvas-card,.ws-create-card,.ws-home-search-empty){
+  border:1px solid rgba(255,255,255,.11)!important;
+  background:var(--av-mother-tool)!important;
+  box-shadow:var(--av-mother-tool-shadow)!important;
+  -webkit-backdrop-filter:var(--av-mother-tool-filter)!important;
+  backdrop-filter:var(--av-mother-tool-filter)!important;
+  color:var(--av-mother-text)!important;
+}
+html.studio-theme-dark:has(.page .layout) body :is(.provider-card,.model-row):is(:hover,:focus-within,.active),
+html.theme-dark:has(.workspace) :is(.launcher-world .ws-card,.ws-new-canvas-card):is(:hover,:focus-within,.selected){
+  border-color:rgba(255,255,255,.18)!important;
+  background:var(--av-mother-tool-hover)!important;
+  box-shadow:var(--av-mother-control-hover-shadow)!important;
+  color:var(--av-mother-text-strong)!important;
+}
+/* C. Inputs and pill controls: the shortcut keycap layer, same as buttons. */
+html.studio-theme-dark:has(.page .layout) :is(.field-frame,input,textarea,select,.picker-search),
+html.theme-dark:has(.workspace) :is(input,textarea,select){
+  border:1px solid var(--av-glass-line)!important;
+  background:var(--av-mother-control)!important;
+  box-shadow:inset 0 2px 7px rgba(0,0,0,.25),inset 0 1px 0 rgba(255,255,255,.095)!important;
+  -webkit-backdrop-filter:var(--av-mother-control-filter)!important;
+  backdrop-filter:var(--av-mother-control-filter)!important;
+  color:var(--av-mother-text-strong)!important;
+}
+html.studio-theme-dark:has(.page .layout) :is(.field-frame,input,textarea,select,.picker-search):focus,
+html.studio-theme-dark:has(.page .layout) .field-frame:focus-within,
+html.theme-dark:has(.workspace) :is(input,textarea,select):focus{
+  outline:0!important;
+  border-color:var(--av-glass-line-hover)!important;
+  background:var(--av-mother-control-hover)!important;
+  box-shadow:0 0 0 3px rgba(183,224,203,.07),inset 0 2px 7px rgba(0,0,0,.25)!important;
+}
+/* The field frame owns the material; its inner input stays bare. */
+html.studio-theme-dark:has(.page .layout) :is(.field-frame,.key-input-line) :is(input,textarea,select){
+  border:0!important;
+  outline:0!important;
+  background:transparent!important;
+  box-shadow:none;
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
+}
+/* Selected rows keep the material and only lift the light. */
+html.theme-dark:has(.workspace) :is(.ws-project-row.active,.ws-create-confirm,.ws-mini-btn.primary),html.theme-dark:has(.workspace) .ws-card-kind.smart,html.theme-dark:has(.workspace) .ws-card-kind[class*="smart"],html.theme-dark:has(.workspace) .ws-new-canvas-icon{
+  color:var(--av-mother-text-strong)!important;
+  border-color:rgba(255,255,255,.18)!important;
+  background:var(--av-mother-control-hover)!important;
+  box-shadow:var(--av-mother-control-hover-shadow)!important;
+}
+html.theme-dark:has(.workspace) .ws-project-row.active :is(.ws-project-name,.ws-project-icon,.ws-project-count,.ws-proj-act){
+  color:var(--av-mother-text-strong)!important;
+}
+/* Canvas cover placeholder keeps its dot grid, drawn over the same glass. */
+html.theme-dark:has(.workspace) .launcher-world .ws-card-cover-empty{
+  color:var(--av-mother-text)!important;
+  background-image:radial-gradient(circle,rgba(255,255,255,.09) 1px,transparent 1.1px),
+        linear-gradient(145deg,rgba(255,255,255,.045),rgba(12,13,15,.42));
+  background-size:18px 18px,auto;
+}
+/* Link-shaped top-level buttons must match real buttons. */
+html.theme-dark:has(.workspace) a.ws-icon-btn{
+  position:relative;
+  isolation:isolate;
+  overflow:hidden;
+  color:var(--av-mother-text)!important;
+  border:1px solid var(--av-glass-line)!important;
+  background:var(--av-mother-control)!important;
+  box-shadow:var(--av-mother-control-shadow)!important;
+  -webkit-backdrop-filter:var(--av-mother-control-filter)!important;
+  backdrop-filter:var(--av-mother-control-filter)!important;
+}
+html.theme-dark:has(.workspace) a.ws-icon-btn:hover{
+  color:var(--av-mother-text-strong)!important;
+  border-color:var(--av-glass-line-hover)!important;
+  transform:translateY(-1px);
+  background:var(--av-mother-control-hover)!important;
+  box-shadow:var(--av-mother-control-hover-shadow)!important;
+}
+/* Scroll containers must not nest a second blur pass inside a blurred panel. */
+html.studio-theme-dark:has(.page .layout) :is(.provider-list,.model-list,.lora-list){
+  background:transparent!important;
+  box-shadow:none;
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
+}
+
+/* Homepage cover/trash controls: keep shared glass but remove danger tint.
+   This block is more specific than the global danger button rules above.
+   Tier A is excluded: `.ws-trash-entry` is a top-level button and must take the
+   mother material from the Tier A system, not this thin control layer. */
+html.theme-dark:has(.workspace) body :is(
+  .ws-card-delete-actions button,
+  .ws-trash-confirm-actions button,
+  .ws-trash-act,
+  .ws-pop-item.danger
+):not(.run-btn):not(.downstream-prompt-lock):not([data-av-interaction="top"]){
+  color:var(--home-shortcut-mother-text,rgba(238,244,240,.82))!important;
+  border:1px solid var(--white-a9)!important;
+  background:var(--home-shortcut-mother-control)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.095),inset 0 -1px 0 rgba(0,0,0,.17),0 2px 7px var(--black-a10)!important;
+}
+html.theme-dark:has(.workspace) body :is(
+  .ws-card-delete-actions button,
+  .ws-trash-confirm-actions button,
+  .ws-trash-act,
+  .ws-pop-item.danger
+):not(.run-btn):not(.downstream-prompt-lock):not([data-av-interaction="top"]):is(:hover,:focus-visible,.active,[aria-selected="true"]){
+  color:rgba(249,252,250,.96)!important;
+  border-color:var(--white-a14)!important;
+  background:var(--home-shortcut-mother-control-hover)!important;
+  box-shadow:0 6px 14px var(--black-a16),inset 0 1px 0 rgba(255,255,255,.11),inset 0 -1px 0 var(--black-a13)!important;
+}
+
+/* Project delete stays red; this is intentionally outside the homepage
+   cover/trash neutralization scope and must beat the shared glass rule. */
+html.theme-dark:has(.workspace) body .ws-project-confirm-actions .ws-confirm-btn{
+  color:rgba(255,205,212,.96)!important;
+  border-color:rgba(255,157,169,.24)!important;
+}
+html.theme-dark:has(.workspace) body .ws-project-confirm-actions .ws-confirm-btn:is(:hover,:focus-visible){
+  color:rgba(255,214,220,.98)!important;
+  border-color:rgba(255,157,169,.42)!important;
+}
+
+/* SHARED_MOTHER_GLASS_GAP_CLOSURE_20260808
+   Surfaces that earlier rounds never mapped. Audited against real HTML/JS class
+   usage, so only elements that actually own a background or border are listed.
+   Layer choice follows the nearest already-mapped sibling, not a new value:
+     .recommend-platform-card follows .recommend-card  -> tool
+     .lora-field              follows .field-frame     -> control
+     .ws-home-sort-option     follows .ws-pop-item     -> control
+     .ws-card-delete-confirm  follows .ws-card-pop     -> panel
+   Pure text, layout and scroll containers are deliberately excluded. */
+
+/* Panel layer: card-covering overlays and dialogs. */
+html.theme-dark:has(.workspace) body .ws-card-delete-confirm{
+  border:0!important;
+  outline:1px solid var(--av-mother-edge)!important;
+  outline-offset:-1px;
+  background:var(--av-mother-surface)!important;
+  box-shadow:var(--av-mother-shadow)!important;
+  -webkit-backdrop-filter:var(--av-mother-panel-filter)!important;
+  backdrop-filter:var(--av-mother-panel-filter)!important;
+  color:var(--av-mother-text)!important;
+}
+
+/* Tool layer: cards and tab strips that sit inside a panel. */
+html.studio-theme-dark:has(.page .layout) body .picker-cat-tabs{
+  border:1px solid rgba(255,255,255,.11)!important;
+  background:var(--av-mother-tool)!important;
+  box-shadow:var(--av-mother-tool-shadow)!important;
+  -webkit-backdrop-filter:var(--av-mother-tool-filter)!important;
+  backdrop-filter:var(--av-mother-tool-filter)!important;
+  color:var(--av-mother-text)!important;
+}
+
+
+/* Control layer: menu rows, field frames, pills and badges. */
+html.theme-dark:has(.workspace) body :is(.ws-home-sort-option,.ws-trash-badge),
+html.studio-theme-dark:has(.page .layout) body :is(.lora-field,.provider-protocol-pill,.picker-sum-chip-empty){
+  border:1px solid var(--av-glass-line)!important;
+  background:var(--av-mother-control)!important;
+  box-shadow:var(--av-mother-control-shadow)!important;
+  -webkit-backdrop-filter:var(--av-mother-control-filter)!important;
+  backdrop-filter:var(--av-mother-control-filter)!important;
+  color:var(--av-mother-text)!important;
+}
+html.theme-dark:has(.workspace) body .ws-home-sort-option:is(:hover,:focus-visible,.active,[aria-selected="true"]),
+html.studio-theme-dark:has(.page .layout) body .lora-field:focus-within{
+  border-color:var(--av-glass-line-hover)!important;
+  background:var(--av-mother-control-hover)!important;
+  color:var(--av-mother-text-strong)!important;
+}
+/* A field frame owns the material; the input inside it stays bare. */
+html.studio-theme-dark:has(.page .layout) body .lora-field :is(input,select,textarea){
+  border:0!important;
+  outline:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
+}
+/* Empty card covers keep the established "cover is never blurred" decision:
+   they take the tool material for color unity but add no second blur pass
+   inside the already blurred card. */
+html.theme-dark:has(.workspace) body .ws-card-cover-empty{
+  border:0!important;
+  background:var(--av-mother-tool)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
+  color:var(--av-mother-text)!important;
+}
+
+/* TOP_LEVEL_INTERACTION_SYSTEM_20260808
+   Tier A now carries the whole approved material, not just a sweep.
+   Reference: the Composer prompt-tool buttons and the selection dock, i.e.
+   compact mother surface + nested mother shadow + hairline mother edge, with
+   one specular sweep and one pointer highlight. No idle animation.
+   The earlier version only added the sweep, so each page's own thin keycap
+   background still showed through and top-level buttons never matched.
+   Repeated capability attributes intentionally beat historical important
+   selectors left behind by per-page rounds. */
+@keyframes av-top-specular-sweep{from{transform:translateX(-38%)}to{transform:translateX(38%)}}
+:root body :is(button,a)[data-av-interaction="top"][data-av-interaction][data-av-interaction]{
+  --av-top-sweep:rgba(255,255,255,.62);--av-top-sweep-opacity:.72;--av-top-sweep-duration:.8s;
+  --av-top-spot-core:rgba(255,255,255,.30);--av-top-spot-mid:rgba(255,255,255,.085);
+  --av-glass-x:50%;--av-glass-y:0%;
+  position:relative;isolation:isolate;overflow:hidden!important;
+  border:0!important;
+  outline:1px solid var(--av-mother-edge)!important;
+  outline-offset:-1px;
+  color:var(--av-mother-text)!important;
+  background:var(--av-mother-surface-compact)!important;
+  background-size:auto;
+  box-shadow:var(--av-mother-nested-shadow)!important;
+  -webkit-backdrop-filter:var(--av-mother-control-filter)!important;
+  backdrop-filter:var(--av-mother-control-filter)!important;
+  text-shadow:0 1px 2px var(--black-a38);
+  filter:none!important;
+  transform:none;
+  transition:outline-color .16s ease,color .16s ease,box-shadow .18s ease,background .18s ease!important;
+}
+:root body :is(button,a)[data-av-interaction="top"][data-av-interaction][data-av-interaction]::before{
+  content:""!important;display:block!important;position:absolute!important;z-index:1!important;pointer-events:none!important;inset:-40% -70%!important;border-radius:inherit!important;opacity:0!important;
+  background:linear-gradient(105deg,transparent 38%,var(--av-top-sweep) 49%,transparent 60%)!important;filter:none!important;transform:translateX(-38%);animation:none!important;
+}
+:root body :is(button,a)[data-av-interaction="top"][data-av-interaction][data-av-interaction]::after{
+  content:""!important;display:block!important;position:absolute!important;z-index:0!important;pointer-events:none!important;inset:1px!important;border-radius:inherit!important;opacity:0!important;
+  background:radial-gradient(ellipse 112px 76px at var(--av-glass-x) var(--av-glass-y),var(--av-top-spot-core),var(--av-top-spot-mid) 31%,transparent 72%)!important;
+  transform:none!important;animation:none!important;transition:opacity .16s ease!important;
+}
+:root body :is(button,a)[data-av-interaction="top"][data-av-interaction][data-av-interaction]>*{position:relative;z-index:2}
+:root body :is(button,a)[data-av-interaction="top"][data-av-interaction][data-av-interaction] :is(svg,i){color:currentColor;filter:none!important}
+/* Hover, focus and selected all resolve to the one lifted mother state. */
+:root body :is(button,a)[data-av-interaction="top"][data-av-interaction][data-av-interaction]:not(:disabled):not([aria-disabled="true"]):not([aria-busy="true"]):is(:hover,:focus-visible,.active,[aria-pressed="true"],[aria-selected="true"],[aria-expanded="true"]){
+  outline-color:var(--color-f5fcf9-a11);
+  color:var(--av-mother-text-strong)!important;
+  background:var(--av-mother-surface-compact-hover)!important;
+  box-shadow:var(--av-mother-nested-shadow-hover)!important;
+  transform:none!important;
+}
+:root body :is(button,a)[data-av-interaction="top"][data-av-interaction][data-av-interaction]:not(:disabled):not([aria-disabled="true"]):not([aria-busy="true"]):is(:hover,:focus-visible)::before{
+  opacity:var(--av-top-sweep-opacity)!important;animation:av-top-specular-sweep var(--av-top-sweep-duration) cubic-bezier(.16,1,.3,1) both!important;
+}
+:root body :is(button,a)[data-av-interaction="top"][data-av-interaction][data-av-interaction].av-pointer-active:not(:disabled):not([aria-disabled="true"]):not([aria-busy="true"]):hover::after{opacity:.82!important}
+:root body :is(button,a)[data-av-interaction="top"][data-av-interaction][data-av-interaction]:focus-visible::after{opacity:.52!important}
+:root body :is(button,a)[data-av-interaction="top"][data-av-interaction][data-av-interaction]:focus-visible{
+  outline:2px solid rgba(255,255,255,.82)!important;
+  outline-offset:2px!important;
+  box-shadow:0 0 0 4px var(--white-a7),var(--av-mother-nested-shadow-hover)!important;
+}
+:root body :is(button,a)[data-av-interaction="top"][data-av-interaction][data-av-interaction]:not(:disabled):not([aria-disabled="true"]):not([aria-busy="true"]):active{
+  transform:translateY(.75px) scale(.988)!important;
+  box-shadow:inset 0 4px 10px rgba(0,0,0,.42),inset 0 -1px 0 rgba(255,255,255,.075),0 2px 5px rgba(0,0,0,.20)!important;
+}
+:root body :is(button,a)[data-av-interaction="top"][data-av-interaction][data-av-interaction][data-av-pointer="off"]{--av-top-sweep:rgba(255,255,255,.82);--av-top-sweep-opacity:.9;--av-top-sweep-duration:.92s}
+:root body :is(button,a)[data-av-interaction="top"][data-av-interaction][data-av-interaction][data-av-pointer="off"]::after{display:none!important}
+/* Semantic tone stays in copy, icon and sweep tint; the material never forks. */
+:root body :is(button,a)[data-av-interaction="top"][data-av-interaction][data-av-interaction][data-av-tone="danger"]{
+  --av-top-sweep:rgba(255,205,214,.46);--av-top-spot-core:rgba(255,164,178,.22);--av-top-spot-mid:rgba(255,126,148,.07);
+  color:var(--av-danger-copy);
+  outline-color:var(--av-danger-edge);
+}
+:root body :is(button,a)[data-av-interaction="top"][data-av-interaction][data-av-interaction][data-av-tone="danger"]:not(:disabled):is(:hover,:focus-visible){
+  color:var(--av-danger-copy)!important;
+  outline-color:var(--av-danger-edge)!important;
+}
+:root body :is(button,a)[data-av-interaction="top"][data-av-interaction][data-av-interaction]:is(:disabled,[aria-disabled="true"]){
+  color:rgba(214,214,210,.34);
+  outline-color:rgba(245,252,249,.040);
+  box-shadow:var(--av-mother-nested-shadow)!important;
+  text-shadow:none!important;
+  filter:saturate(.20);
+  transform:none!important;
+}
+:root body :is(button,a)[data-av-interaction="top"][data-av-interaction][data-av-interaction]:is(:disabled,[aria-disabled="true"],[aria-busy="true"],.loading,.is-loading,.running,.is-running)::before,
+:root body :is(button,a)[data-av-interaction="top"][data-av-interaction][data-av-interaction]:is(:disabled,[aria-disabled="true"],[aria-busy="true"],.loading,.is-loading,.running,.is-running)::after{opacity:0!important;animation:none!important}
+@media (prefers-reduced-motion:reduce){
+ :root body :is(button,a)[data-av-interaction="top"][data-av-interaction][data-av-interaction]{transition:none!important}
+ :root body :is(button,a)[data-av-interaction="top"][data-av-interaction][data-av-interaction]::before{opacity:0!important;animation:none!important}
+ :root body :is(button,a)[data-av-interaction="top"][data-av-interaction][data-av-interaction]::after{opacity:0!important;transition:none!important}
+}
+/* CANVAS_NESTED_GLASS_CONTROLS_20260808
+   Final canvas-only cascade winner for the requested Composer controls.
+   The parent panel supplies the blur; compact surface + calibrated shadow supply
+   the visible second glass layer without another full-size backdrop pass. */
+html.theme-dark:has(.shell) body #composer .prompt-tool-group.prompt-tool-group-primary{
+  gap:6px!important;
+  overflow:visible!important;
+  border:0!important;
+  background:transparent!important;
+  box-shadow:none;
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
+}
+html.theme-dark:has(.shell) body #composer .prompt-tool-group.prompt-tool-group-primary .composer-template-btn{
+  border:0!important;
+  border-radius:var(--radius-full)!important;
+  outline:1px solid var(--av-mother-edge)!important;
+  outline-offset:-1px;
+  background:var(--av-mother-surface-compact)!important;
+  box-shadow:var(--av-mother-nested-shadow)!important;
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
+  color:var(--av-mother-text)!important;
+  transform:none;
+}
+html.theme-dark:has(.shell) body #composer .prompt-tool-group.prompt-tool-group-primary .composer-template-btn:not(:last-child){border-right:0!important;}
+html.theme-dark:has(.shell) body #composer .prompt-tool-group.prompt-tool-group-primary .composer-template-btn:is(:hover,:focus-visible,.active):not(:disabled){
+  outline-color:var(--color-f5fcf9-a11)!important;
+  background:var(--av-mother-surface-compact-hover)!important;
+  box-shadow:var(--av-mother-nested-shadow-hover)!important;
+  color:var(--av-mother-text-strong)!important;
+  transform:none!important;
+}
+html.theme-dark:has(.shell) body #composer .prompt-tool-group.prompt-tool-group-primary .composer-template-btn.is-action-error{
+  color:var(--av-mother-danger)!important;
+  outline-color:rgba(255,157,169,.30)!important;
+}
+
+/* Every param pill, not an enumerated subset: the video-options toggle used to
+   miss this list and fell back to the superseded metallic gradient. */
+html.theme-dark:has(.shell) body #composer .param-line .smart-pill{
+  border:0!important;
+  border-radius:var(--radius-full)!important;
+  outline:1px solid var(--av-mother-edge)!important;
+  outline-offset:-1px;
+  background:var(--av-mother-surface-compact)!important;
+  background-size:auto;
+  box-shadow:var(--av-mother-nested-shadow)!important;
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
+  color:var(--av-mother-text)!important;
+}
+html.theme-dark:has(.shell) body #composer .param-line .smart-control:is(:hover,:focus-within,.pinned,.interacting) > .smart-pill,
+html.theme-dark:has(.shell) body #composer .param-line .video-options-control:is(:hover,:focus-within,.open) > .smart-pill,
+html.theme-dark:has(.shell) body #composer .param-line .smart-pill:is(:hover,:focus-visible,.active,[aria-expanded="true"]):not(:disabled){
+  outline-color:var(--color-f5fcf9-a11)!important;
+  background:var(--av-mother-surface-compact-hover)!important;
+  box-shadow:var(--av-mother-nested-shadow-hover)!important;
+  color:var(--av-mother-text-strong)!important;
+  transform:none!important;
+}
+
+html.theme-dark:has(.shell) body #composer .run-btn,
+html.theme-dark:has(.shell) body #composer .composer-actions .run-btn{
+  border:0!important;
+  outline:1px solid rgba(198,240,222,.20)!important;
+  outline-offset:-1px;
+  background:
+    radial-gradient(ellipse 120% 84% at 22% -6%,rgba(226,255,242,.20),transparent 66%),
+    linear-gradient(180deg,rgba(196,246,225,.13),rgba(150,226,200,.055) 52%,rgba(0,0,0,.055)),
+    var(--av-mother-surface-compact)!important;
+  box-shadow:var(--av-mother-nested-shadow),0 0 0 1px rgba(186,238,216,.055) inset!important;
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
+  color:rgba(244,255,250,.98);
+  text-shadow:0 1px 10px rgba(150,226,200,.16);
+  filter:none!important;
+  animation:none!important;
+}
+html.theme-dark:has(.shell) body #composer .run-btn:is(:hover,:focus-visible):not(:disabled){
+  outline-color:rgba(208,248,230,.30)!important;
+  background:
+    radial-gradient(ellipse 120% 84% at 22% -6%,rgba(232,255,246,.27),transparent 66%),
+    linear-gradient(180deg,rgba(204,250,230,.18),rgba(158,232,206,.075) 52%,rgba(0,0,0,.045)),
+    var(--av-mother-surface-compact-hover)!important;
+  box-shadow:var(--av-mother-nested-shadow-hover)!important;
+  color:rgba(250,255,253,1)!important;
+}
+html.theme-dark:has(.shell) body #composer .run-btn:disabled{
+  outline-color:rgba(245,252,249,.070)!important;
+  background:var(--av-mother-surface-compact)!important;
+  box-shadow:var(--av-mother-nested-shadow)!important;
+  color:var(--av-mother-text)!important;
+  text-shadow:none;
+  filter:saturate(.35);
+  opacity:.55;
+}
+@media (prefers-reduced-motion:reduce){
+  html.theme-dark:has(.shell) body #composer .prompt-tool-group.prompt-tool-group-primary .composer-template-btn,
+  html.theme-dark:has(.shell) body #composer .param-line .smart-pill,
+  html.theme-dark:has(.shell) body #composer .run-btn{transition:none!important;animation:none!important;}
+}

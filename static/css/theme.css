@@ -1,0 +1,94 @@
+/* studio-theme-dark 由 static/js/theme.js 的 applyTheme() 挂到 <html> 与 <body>
+   两级（三个页面都加载 theme.js）；本文件仅被 canvas-list.html 与 api-settings.html
+   加载。加载序：canvas-list 为 variables→canvas-list→theme→button-glass，
+   api-settings 为 theme→variables→api-settings→button-glass。 */
+html.studio-theme-dark, html.studio-theme-dark body, body.studio-theme-dark{
+    color-scheme: dark;
+    /* 无 !important 仍两侧皆稳：首页胜 canvas-list.css 的 body(0,0,1)；
+       api-settings 页本就输给 button-glass :has(.page .layout) body 的后置 !important */
+    background: var(--color-0f141d);
+    color: var(--color-e5e9f0);
+}
+html, body{
+    overscroll-behavior: auto;
+}
+/* 滚动条族：首页唯一来源（作者规则压 UA 默认即可）；api-settings 页有
+   api-settings.css 末尾同值副本且后置加载，该页本就由副本赢家决定，无需 !important */
+*{
+    scrollbar-width: thin;
+    scrollbar-color: rgba(148, 163, 184, .72) transparent;
+}
+*::-webkit-scrollbar{
+    width: 10px;
+    height: 10px;
+    background: transparent;
+}
+*::-webkit-scrollbar-track{
+    background: transparent;
+}
+*::-webkit-scrollbar-thumb{
+    min-height: 36px;
+    background-color: rgba(148, 163, 184, .72);
+    border: 3px solid transparent;
+    border-right-width: 3px;
+    background-clip: padding-box;
+    border-radius: 999px;
+}
+*::-webkit-scrollbar-thumb:hover{
+    background-color: rgba(100, 116, 139, .86);
+}
+*::-webkit-scrollbar-corner{
+    background: transparent;
+}
+/* ===== 必要项 !important（8 个，勿顺手清除） =====
+   L36 占位色：canvas-list.css 的 .ws-home-search input::placeholder(0,2,1) 特异性
+   更高，去掉后首页搜索框占位色 #657286 会漂移到 #777f7c（golden 未采集该元素）。
+   L44-46 输入三件套：api-settings 页去掉后会被后置表单类规则（.field-frame input
+   等）反超。L75-76/L80-81 action-btn 底色与 hover：api-settings.css 后置类规则
+   会反超底色，且 hover 态不在 golden 采集范围，漂移不可机器发现。 */
+html.studio-theme-dark body input::placeholder, html.studio-theme-dark body textarea::placeholder, body.studio-theme-dark input::placeholder, body.studio-theme-dark textarea::placeholder{
+    color: #657286 !important;
+}
+html.studio-theme-dark body .primary-btn, body.studio-theme-dark .primary-btn{
+    background-color: var(--color-d8dee9);
+    color: #10141d;
+}
+
+html.studio-theme-dark body input, html.studio-theme-dark body textarea, html.studio-theme-dark body select, body.studio-theme-dark input, body.studio-theme-dark textarea, body.studio-theme-dark select{
+    background-color: #0c0d10 !important;
+    color: #e8e8ea !important;
+    border-color: var(--slate-700) !important;
+}
+body.studio-theme-dark{
+    --bg: var(--color-0f141d);
+    --bg-base: var(--color-0f141d);
+    --page: var(--color-0f141d);
+    --card: #171d29;
+    --card-solid: #171d29;
+    --soft: var(--color-111722);
+    --soft-2: #1d2533;
+    --panel: rgba(23,29,41,.92);
+    --text: var(--color-e5e9f0);
+    --text-main: var(--color-e5e9f0);
+    --accent: var(--color-e5e9f0);
+    --line: #2a3444;
+    --line-2: var(--slate-700);
+}
+/* .sidebar 规则已删：唯一匹配页 api-settings 上被 button-glass
+   :is(.sidebar,...) 后置 !important 全面压制，首页无 .sidebar 类元素 */
+
+html.studio-theme-dark body label, body.studio-theme-dark label{
+    color: var(--color-e5e9f0);
+}
+html.studio-theme-dark body ::placeholder, body.studio-theme-dark ::placeholder{
+    color: var(--slate-600);
+}
+html.studio-theme-dark body .action-btn, body.studio-theme-dark .action-btn{
+    background: var(--color-111722) !important;
+    border-color: var(--slate-700) !important;
+    color: var(--color-d8dee9);
+}
+html.studio-theme-dark body .action-btn:hover, body.studio-theme-dark .action-btn:hover{
+    background: #1d2533 !important;
+    color: var(--color-e5e9f0) !important;
+}

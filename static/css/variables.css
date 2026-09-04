@@ -1,0 +1,188 @@
+/* ============================================
+   CSS 变量系统 - 无限智能画布
+   创建时间: 2026-08-14
+   用途: 统一替换硬编码值，消除 !important
+   ============================================ */
+
+:root {
+  /* ==================== 颜色系统 ==================== */
+  
+  /* 文本颜色 - 白色系 */
+  --text-tertiary: rgba(255, 255, 255, 0.52);     /* 辅助文本 */
+  
+  /* 边框颜色 */
+  --border-subtle: rgba(255, 255, 255, 0.075);    /* 微弱边框 (25次) */
+  --border-default: rgba(255, 255, 255, 0.11);    /* 默认边框 (22次) */
+  --border-medium: rgba(255, 255, 255, 0.18);     /* 中等边框 (20次) */
+  
+  /* 背景颜色 - 黑色系 */
+  --bg-overlay: rgba(0, 0, 0, 0.24);              /* 遮罩层 (18次) */
+  --bg-elevated: rgba(0, 0, 0, 0.28);             /* 抬升背景 (20次) */
+  
+  /* 语义颜色 */
+  --color-success: rgba(34, 197, 94, 0.9);        /* 成功 */
+  --color-warning: rgba(251, 191, 36, 0.9);       /* 警告 */
+  --color-info: rgba(59, 130, 246, 0.9);          /* 信息 */
+  
+  /* 灰色系 (Slate) */
+  --slate-600: #475569;
+  --slate-400: #94a3b8;
+  --slate-500: #64748b;                           /* 18次 */
+  
+  
+  /* ==================== 玻璃材质系统 ==================== */
+  /* 已在 button-glass.css 中定义，这里作为文档参考 */
+  
+  /* Panel 层 - 最深材质 */
+  /* --av-mother-panel-filter: blur(18px) saturate(1.23) brightness(1.06); */
+  /* --av-mother-panel-thin-filter: blur(16px) saturate(1.16); */
+  /* --av-mother-panel-desaturated-filter: blur(18px) saturate(0.74) brightness(0.95); */
+  
+  /* Tool 层 - 中等材质 */
+  /* --av-mother-tool-filter: blur(12px) saturate(1.15); */
+  
+  /* Control 层 - 控件材质 */
+  /* --av-mother-control-filter: blur(8px) saturate(1.1); */
+  /* --av-mother-control-light-filter: blur(12px) saturate(1.15); */
+  
+  /* Compact/Nested 层 - 紧凑材质 */
+  /* --av-mother-nested-filter: blur(6px) saturate(1.05); */
+  
+  /* Modal/Deep 层 - 模态深度 */
+  /* --av-mother-ultra-deep-filter: blur(30px) saturate(1.16) brightness(0.96); */
+  
+  
+  
+  
+  /* ==================== 圆角系统 ==================== */
+  --radius-sm: 6px;
+  --radius-7: 7px;   /* 小圆角+ */
+  --radius-md: 8px;
+  --radius-9: 9px;   /* 中等圆角- */
+  --radius-10: 10px; /* 中等圆角 */
+  --radius-11: 11px; /* 中等圆角+ */
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;  /* 完全圆角 */
+  
+  
+  /* ==================== 阴影系统 ==================== */
+  --shadow-strong: 0 8px 16px rgba(0, 0, 0, 0.2);
+  
+  
+
+
+/* ==================== 暗色主题 ==================== */
+
+
+/* ==================== 使用示例 ==================== */
+/*
+替换前（硬编码 + !important）:
+.composer-prompt__placeholder {
+  color: rgba(255, 255, 255, 0.52) !important;
+  border: 1px solid rgba(255, 255, 255, 0.11) !important;
+}
+
+替换后（CSS变量 + 无 !important）:
+.composer-prompt__placeholder {
+  color: var(--text-tertiary);
+  border: 1px solid var(--border-default);
+}
+*/
+
+/* ===== 高频硬编码色 token（PostCSS 自动生成） ===== */
+  --white: #fff;
+  --color-d8dee9: #d8dee9;
+  --slate-900: #0f172a;
+  --white-a14: rgba(255,255,255,.14);
+  --color-e5e9f0: #e5e9f0;
+  --white-a9: rgba(255,255,255,.092);
+  --white-a10: rgba(255,255,255,.10);
+  --black-a22: rgba(0,0,0,.22);
+  --black-a16: rgba(0,0,0,.16);
+  --white-a12: rgba(255,255,255,.12);
+  --white-a4: rgba(255,255,255,.035);
+  --black-a30: rgba(0,0,0,.30);
+  --black-a34: rgba(0,0,0,.34);
+  --white-a6: rgba(255,255,255,.055);
+  --slate-700: #334155;
+  --white-a7: rgba(255,255,255,.07);
+  --red-200: #fecaca;
+  --color-f5fcf9-a11: rgba(245,252,249,.11);
+  --white-a3: rgba(255,255,255,.025);
+  --white-a16: rgba(255,255,255,.16);
+  --black-a38: rgba(0,0,0,.38);
+  --black-a13: rgba(0,0,0,.13);
+  --red-600: #dc2626;
+  --black-a18: rgba(0,0,0,.18);
+  --white-a2: rgba(255,255,255,.018);
+  --black-a10: rgba(0,0,0,.10);
+  --white-a13: rgba(255,255,255,.13);
+  --white-a22: rgba(255,255,255,.22);
+  --color-111722: #111722;
+  --color-0f141d: #0f141d;
+
+/* ==================== 扩展颜色变量（2026-08-18 补充）==================== */
+/* 覆盖剩余 23.1% 硬编码颜色 */
+
+  /* 白色透明度系列 - 精细级别 */
+  --white-a2: rgba(255, 255, 255, 0.018);   /* 11次 - 极微弱 */
+  --white-a2-5: rgba(255, 255, 255, 0.025); /* 12次 */
+  --white-a5-5: rgba(255, 255, 255, 0.055); /* 14次 */
+  --white-a6: rgba(255, 255, 255, 0.06);    /* 6次 */
+  --white-a6-5: rgba(255, 255, 255, 0.065); /* 13次 */
+  --white-a7: rgba(255, 255, 255, 0.07);    /* 14次 */
+  --white-a9: rgba(255, 255, 255, 0.09);    /* 7次 */
+  --white-a9-2: rgba(255, 255, 255, 0.092); /* 16次 */
+  --white-a10: rgba(255, 255, 255, 0.10);   /* 17次 */
+  --white-a12: rgba(255, 255, 255, 0.12);   /* 14次 */
+  --white-a13: rgba(255, 255, 255, 0.13);   /* 8次 */
+  --white-a14: rgba(255, 255, 255, 0.14);   /* 12次 */
+  
+  /* 黑色透明度系列 */
+  --black-a10: rgba(0, 0, 0, 0.10);         /* 10次 */
+  --black-a13: rgba(0, 0, 0, 0.13);         /* 12次 */
+  --black-a16: rgba(0, 0, 0, 0.16);         /* 12次 */
+  --black-a18: rgba(0, 0, 0, 0.18);         /* 9次 */
+  --black-a22: rgba(0, 0, 0, 0.22);         /* 13次 */
+  --black-a30: rgba(0, 0, 0, 0.30);         /* 5次 */
+  --black-a42: rgba(0, 0, 0, 0.42);         /* 11次 */
+  
+  /* 纯色 */
+  --pure-white: #fff;                        /* 12次 */
+  --pure-black: #000;                        /* 6次 */
+  
+  /* Slate 灰色系 */
+  --slate-900: #0f172a;                      /* 12次 - 深灰 */
+  --slate-400: #94a3b8;                      /* 灰色 */
+  --slate-300: #cbd5e1;                      /* 6次 */
+  --slate-200: #e2e8f0;                      /* 5次 */
+  --slate-100: #f8fafc;                      /* 8次 */
+  
+  /* 红色系（危险/错误） */
+  --red-600: #dc2626;                        /* 8次 - 危险主色 */
+  --red-300: #fca5a5;                        /* 5次 */
+  --red-200: #fecaca;                        /* 14次 - 错误背景 */
+  --red-100: #fee2e2;                        /* 7次 - 浅红背景 */
+  
+  /* 青绿色系（成功/品牌） */
+
+/* ==================== 语义化命名映射 ==================== */
+/* 为常用场景提供语义化别名 */
+
+  /* 边框 */
+  --border-ultra-subtle: var(--white-a5-5);  /* 极微弱边框 */
+  --border-very-subtle: var(--white-a6-5);   /* 很微弱边框 */
+  --border-light: var(--white-a9-2);         /* 轻边框 */
+  --border-normal: var(--white-a12);         /* 常规边框 */
+  
+  /* 背景 */
+  --bg-normal: var(--black-a22);             /* 常规背景 */
+  
+  /* 高光/遮罩 */
+  --highlight-subtle: var(--white-a2);       /* 微弱高光 */
+  --highlight-strong: var(--white-a14);      /* 强高光 */
+  
+  /* 错误/危险状态 */
+  --error-text: var(--red-600);              /* 错误文本 */
+}

@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:,">
+    <title>API 设置</title>
+    <script>
+        (function(){
+            document.documentElement.classList.add('studio-theme-dark', 'theme-dark');
+            if(new URLSearchParams(location.search).get('embed') === '1') document.documentElement.classList.add('api-settings-embed');
+        })();
+    </script>
+    <script src="/static/vendor/js/lucide.js?v=2026.07.15.1786174994"></script>
+    <script src="/static/js/theme.js?v=2026.07.15.1786174994"></script>
+    <script src="/static/js/i18n.js?v=2026.07.15.1786872950"></script>
+    <link rel="stylesheet" href="/static/css/theme.css?v=2026.07.15.1787312284">
+<link rel="stylesheet" href="/static/css/variables.css?v=2026.07.15.1787984550">
+<link rel="stylesheet" href="/static/css/api-settings.css?v=2026.07.15.1787637327">
+<link rel="stylesheet" href="/static/css/button-glass.css?v=2026.07.15.1787984550">
+</head>
+<body>
+    <div class="page">
+        <div class="wrap">
+            <header class="page-head">
+                <div>
+                    <div class="title" data-i18n="api.title">API 设置</div>
+                    <div class="sub" data-i18n="api.subtitle">管理平台地址、模型列表和 Key。Key 写入后端 env，页面不会回显完整内容。</div>
+                </div>
+                <div id="status" class="status"></div>
+            </header>
+
+            <div class="layout">
+                <aside class="sidebar">
+                    <div class="side-section-title" data-i18n="api.providersTitle">平台列表</div>
+                    <div id="providerList" class="provider-list"></div>
+                    <div class="sidebar-footer">
+                        <button class="add-btn" type="button" data-av-interaction="top" data-av-pointer="off" data-action="addProvider"><i data-lucide="plus" class="w-4 h-4"></i><span data-i18n="api.addProvider">新增平台</span></button>
+                    </div>
+                </aside>
+
+                <main id="settingsContent" class="content">
+                    <div class="content-head">
+                        <div>
+                            <div id="editorTitle" class="editor-title" data-i18n="api.provider">平台</div>
+                            <div class="editor-sub" data-i18n="api.editorSub">配置基础信息、API Key 和可用模型</div>
+                        </div>
+                        <div class="content-actions">
+                            <button id="deleteBtn" class="action-btn danger-btn api-page-delete-btn" type="button" data-av-interaction="top" data-av-tone="danger"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i><span data-i18n="api.delete">删除</span></button>
+                            <button class="action-btn save-btn api-page-save-btn" type="button" data-av-interaction="top" data-action="saveProviders"><i data-lucide="save" class="w-3.5 h-3.5"></i><span data-i18n="api.save">保存</span></button>
+                        </div>
+                    </div>
+
+                    <section class="block">
+                        <div class="block-head">
+                            <div>
+                                <div class="block-title" data-i18n="api.basicInfo">基本信息</div>
+                                <div class="block-desc" data-i18n="api.basicHint">平台显示名、唯一 ID 和请求地址</div>
+                            </div>
+                        </div>
+                        <div class="form">
+                            <label class="field full">
+                                <span class="label" data-i18n="api.platformName">平台名称</span>
+                                <div class="field-frame"><input id="nameInput" type="text" placeholder="Comfly"></div>
+                                <span class="hint"><span data-i18n="api.platformIdShown">平台 ID</span>: <span id="idPreview" style="font-family:ui-monospace,Menlo,monospace;color:var(--text)">—</span></span>
+                                <input id="idInput" type="hidden">
+                            </label>
+                            <label class="field full api-base-url-field">
+                                <span class="label" data-i18n="api.baseUrl">请求地址</span>
+                                <div class="field-frame"><input id="baseInput" type="text" placeholder="https://api.example.com/v1"></div>
+                                <div class="ms-hint">
+                                    <span class="ms-line"><span data-i18n="api.msChinaEndpoint">国内默认请求地址：</span><span class="inline-code">https://api-inference.modelscope.cn/v1</span></span>
+                                    <span class="ms-line"><span data-i18n="api.msGlobalEndpoint">国外使用请求地址：</span><span class="inline-code">https://api-inference.modelscope.ai/v1</span></span>
+                                </div>
+                                <div class="apimart-hint">
+                                    <span class="ms-line">国内请求地址：<span class="inline-code">https://apib.ai</span></span>
+                                </div>
+                                <div class="volcengine-hint">
+                                    <span class="ms-line">方舟默认请求地址：<span class="inline-code">https://ark.cn-beijing.volces.com/api/v3</span></span>
+                                    <span class="ms-line">Seedance 视频生成使用方舟 API Key，验证会请求 <span class="inline-code">/api/v3/models</span>。</span>
+                                </div>
+                            </label>
+                            <label class="field full api-key-field">
+                                <span class="label api-key-label">API Key</span>
+                                <div class="key-panel api-standard-key-row">
+                                    <div class="key-input-line">
+                                        <div class="field-frame"><input id="keyInput" type="password"></div>
+                                        <div class="key-actions">
+                                            <button class="key-btn" type="button" data-action="saveKeyOnly" title="保存 Key" data-i18n-title="api.saveKeyTitle"><i data-lucide="check" class="w-4 h-4"></i></button>
+                                            <button class="key-btn key-clear" type="button" data-action="clearKeyOnly" title="清除 Key" data-i18n-title="api.clearKeyTitle"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <span id="keyHint" class="hint"></span>
+                                <div class="volcengine-key-stack" hidden>
+                                    <div class="rh-key-item">
+                                        <div class="rh-key-head">
+                                            <div>
+                                                <div class="rh-key-title" data-i18n="api.volcengineArkKey">方舟 API Key · 生成视频</div>
+                                                <div class="rh-key-desc" data-i18n="api.volcengineArkKeyDesc">用于 Seedance 2.0 生成接口，Authorization: Bearer。</div>
+                                            </div>
+                                        </div>
+                                        <span id="volcArkKeyHint" class="hint"></span>
+                                    </div>
+                                    <div class="rh-key-item">
+                                        <div class="rh-key-head">
+                                            <div>
+                                                <div class="rh-key-title" data-i18n="api.volcengineAssetKeys">素材库 AK/SK · 上传素材</div>
+                                                <div class="rh-key-desc" data-i18n="api.volcengineAssetKeysDesc">用于 CreateAssetGroup / CreateAsset / GetAsset 的 Access Key 鉴权。</div>
+                                            </div>
+                                        </div>
+                                        <div class="key-input-line">
+                                            <div class="field-frame"><input id="volcAkInput" type="password" placeholder="Access Key ID"></div>
+                                        </div>
+                                        <div class="key-input-line">
+                                            <div class="field-frame"><input id="volcSkInput" type="password" placeholder="Secret Access Key"></div>
+                                            <div class="key-actions">
+                                                <button class="key-btn" type="button" data-action="saveVolcengineAssetKeys" title="保存火山素材库 AK/SK"><i data-lucide="check" class="w-4 h-4"></i></button>
+                                                <button class="key-btn key-clear" type="button" data-action="clearVolcengineAssetKeys" title="清除火山素材库 AK/SK"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                                            </div>
+                                        </div>
+                                        <span id="volcAssetKeyHint" class="hint"></span>
+                                    </div>
+                                    <div class="rh-key-item volcengine-project-card">
+                                        <div class="rh-key-head">
+                                            <div>
+                                                <div class="rh-key-title" data-i18n="api.volcengineProject">素材库项目</div>
+                                                <div class="rh-key-desc" data-i18n="api.volcengineProjectDesc">ProjectName 必须和视频生成 API Key 所属项目一致。</div>
+                                            </div>
+                                        </div>
+                                        <div class="volcengine-project-grid">
+                                            <div class="rh-card-title-field">
+                                                <span>ProjectName</span>
+                                                <input id="volcProjectInput" type="text" value="default">
+                                            </div>
+                                            <div class="rh-card-title-field">
+                                                <span>Region</span>
+                                                <input id="volcRegionInput" type="text" value="cn-beijing">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="ms-hint">
+                                    <span class="ms-line"><span data-i18n="api.msTokenCn">获取 Token · 国内：</span><a href="https://www.modelscope.cn/my/access/token" target="_blank">https://www.modelscope.cn/my/access/token</a></span>
+                                    <span class="ms-line"><span data-i18n="api.msTokenGlobal">获取 Token · 国外：</span><a href="https://www.modelscope.ai/my/access/token" target="_blank">https://www.modelscope.ai/my/access/token</a></span>
+                                </div>
+                            </label>
+                            
+                            
+                            
+                            <!-- 验证操作行 -->
+                            <div class="verify-action-row">
+                                <button id="testUrlBtn" class="action-btn" type="button" data-av-interaction="top">
+                                    <i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i><span data-i18n="api.testUrl">验证地址</span>
+                                </button>
+                                <button id="probeAsyncBtn" class="action-btn" type="button" data-av-interaction="top">
+                                    <i data-lucide="radar" class="w-3.5 h-3.5"></i><span>验证协议</span>
+                                </button>
+                                <div class="field-frame protocol-selector-wrap" data-glass-select="protocol">
+                                    <select id="protocolInput" aria-hidden="true" tabindex="-1">
+                                        <option value="openai" data-i18n="api.protocolOpenAI">OpenAI 直连</option>
+                                        <option value="apimart" data-i18n="api.protocolApimart">异步协议</option>
+                                        <option value="gemini" data-i18n="api.protocolGemini">Gemini 协议</option>
+                                        <option value="volcengine">方舟/Ark 任务协议</option>
+                                    </select>
+                                    <button class="glass-select-trigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-controls="protocolInputMenu">
+                                        <span class="glass-select-value"></span>
+                                        <i data-lucide="chevron-down" class="glass-select-chevron" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+                                <div class="field-frame image-request-mode-wrap" data-glass-select="image-request-mode">
+                                    <select id="imageRequestModeInput" title="图片接口" aria-hidden="true" tabindex="-1">
+                                        <option value="openai">图片：OpenAI 标准</option>
+                                        <option value="openai-json">图片：OpenAI JSON</option>
+                                        <option value="openai-video-proxy">图片：OpenAI 中转</option>
+                                        <option value="openai-responses">图片：OpenAI RS</option>
+                                        <option value="tudou-async">图片：土豆 GPT-Image-2 异步</option>
+                                    </select>
+                                    <button class="glass-select-trigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-controls="imageRequestModeInputMenu">
+                                        <span class="glass-select-value"></span>
+                                        <i data-lucide="chevron-down" class="glass-select-chevron" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div id="verifyResult" style="display:none;padding:2px 0;grid-column:1/-1"></div>
+                        </div>
+                    </section>
+
+
+                    <div id="modelsHead" class="block models-toolbar">
+                        <div>
+                            <div class="block-title" data-i18n="api.modelsTitle">模型列表</div>
+                            <div class="block-desc" data-i18n="api.modelsDesc">从上游 API 自动拉取所有可用模型并按类型分类（image / chat / video）</div>
+                        </div>
+                        <div class="models-toolbar-actions">
+                            <button id="fetchModelsBtn" class="action-btn primary-btn" type="button" data-av-interaction="top">
+                                <i data-lucide="download-cloud" class="w-3.5 h-3.5"></i><span data-i18n="api.fetchModels">拉取模型</span>
+                            </button>
+                            <button id="openPickerBtn" class="action-btn" type="button" data-av-interaction="top" disabled style="opacity:.5">
+                                <i data-lucide="list-checks" class="w-3.5 h-3.5"></i><span data-i18n="api.selectModels">选择模型</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="model-grid">
+                        <section class="block">
+                            <div class="block-head">
+                                <div>
+                                    <div class="block-title" data-i18n="api.imageModels">生图模型</div>
+                                    <div class="block-desc" data-i18n="api.imageHint">智能画布图片生成节点使用</div>
+                                    <div class="ms-hint">
+                                        <span class="ms-line"><span data-i18n="api.msModelExample">模型名称示意：</span><span class="inline-code">Tongyi-MAI/Z-Image-Turbo</span></span>
+                                    </div>
+                                </div>
+                                <button class="ghost-btn" type="button" data-action="addModel" data-kind="image"><i data-lucide="plus" class="w-3.5 h-3.5"></i><span data-i18n="api.model">模型</span></button>
+                            </div>
+                            <div id="imageModelList" class="model-list"></div>
+                        </section>
+
+                        <section class="block">
+                            <div class="block-head">
+                                <div>
+                                    <div class="block-title" data-i18n="api.chatModels">聊天模型</div>
+                                    <div class="block-desc" data-i18n="api.chatHint">用于文本辅助能力</div>
+                                </div>
+                                <button class="ghost-btn" type="button" data-action="addModel" data-kind="chat"><i data-lucide="plus" class="w-3.5 h-3.5"></i><span data-i18n="api.model">模型</span></button>
+                        </div>
+                        <div id="chatModelList" class="model-list"></div>
+                    </section>
+
+                        <section class="block">
+                            <div class="block-head">
+                                <div>
+                                    <div class="block-title" data-i18n="api.videoModels">视频模型</div>
+                                    <div class="block-desc" data-i18n="api.videoHint">智能画布视频生成节点使用</div>
+                                </div>
+                                <button class="ghost-btn" type="button" data-action="addModel" data-kind="video"><i data-lucide="plus" class="w-3.5 h-3.5"></i><span data-i18n="api.model">模型</span></button>
+                            </div>
+                            <div id="videoModelList" class="model-list"></div>
+                        </section>
+
+                        <section id="msLoraBlock" class="block ms-lora-block">
+                            <div class="block-head">
+                                <div>
+                                    <div class="block-title" data-i18n="api.loraManager">LoRA 管理</div>
+                                    <div class="block-desc" data-i18n="api.loraManagerDesc">为 ModelScope 生图模型绑定可用 LoRA。智能画布 MS 节点会按当前模型自动筛选。</div>
+                                    <div class="ms-hint">
+                                        <span class="ms-line"><span data-i18n="api.msCnModels">中文模型库：</span><a href="https://www.modelscope.cn/aigc/models" target="_blank">https://www.modelscope.cn/aigc/models</a></span>
+                                        <span class="ms-line"><span data-i18n="api.msEnModels">英文模型库：</span><a href="https://www.modelscope.ai/civision/models" target="_blank">https://www.modelscope.ai/civision/models</a></span>
+                                    </div>
+                                </div>
+                                <button class="ghost-btn" type="button" data-action="addMsLora"><i data-lucide="plus" class="w-3.5 h-3.5"></i><span>LoRA</span></button>
+                            </div>
+                            <div id="msLoraList" class="lora-list"></div>
+                        </section>
+                </div>
+            </main>
+        </div>
+        </div>
+    </div>
+
+    <!-- 模型选择浮层 -->
+    <div id="modelPickerOverlay" class="picker-overlay">
+        <div class="picker-modal">
+            <div class="picker-head">
+                <div>
+                    <div class="picker-title">从上游拉取的模型清单</div>
+                    <div id="pickerCount" class="picker-count">—</div>
+                </div>
+                <div class="picker-close" data-action="closeModelPicker"><i data-lucide="x" class="w-4 h-4"></i></div>
+            </div>
+            <div class="picker-toolbar">
+                <input id="pickerFilter" class="picker-search" type="text" placeholder="按名称搜索模型…">
+                <div class="picker-cat-tabs">
+                    <button class="picker-cat-tab active" data-cat="all" data-action="selectPickerCat">全部 <span class="cat-count">0</span></button>
+                    <button class="picker-cat-tab" data-cat="image" data-action="selectPickerCat">生图 <span class="cat-count">0</span></button>
+                    <button class="picker-cat-tab" data-cat="chat" data-action="selectPickerCat">LLM <span class="cat-count">0</span></button>
+                    <button class="picker-cat-tab" data-cat="video" data-action="selectPickerCat">视频 <span class="cat-count">0</span></button>
+                </div>
+            </div>
+            <div id="pickerList" class="picker-body"></div>
+            <div id="pickerSummary" class="picker-summary">
+                <span class="picker-summary-title">将应用：</span>
+                <span id="sumImage" class="picker-sum-chip picker-sum-chip-empty">生图 0</span>
+                <span id="sumChat" class="picker-sum-chip picker-sum-chip-empty">聊天 0</span>
+                <span id="sumVideo" class="picker-sum-chip picker-sum-chip-empty">视频 0</span>
+                <span id="sumUnsel" style="margin-left:auto;color:var(--faint)">未选 0</span>
+            </div>
+            <div class="picker-foot">
+                <button class="action-btn" type="button" data-action="closeModelPicker">取消</button>
+                <button class="action-btn save-btn" type="button" data-av-interaction="top" data-action="applyModelPicker">应用到模型列表</button>
+            </div>
+        </div>
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+<script src="/static/js/glass-interaction.js?v=2026.07.15.1786174994"></script>
+    <script src="/static/js/modules/ui-utils.js?v=2026.07.15.1786891976"></script>
+    <script src="/static/js/modules/glass-select.js?v=2026.07.15.1786891976"></script>
+    <script src="/static/js/api-settings-view.js?v=2026.07.15.1786891976"></script>
+    <script src="/static/js/api-settings.js?v=2026.07.15.1787625346"></script>
+</body>
+</html>

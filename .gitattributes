@@ -1,0 +1,7 @@
+# 本仓库存量文件行尾真实混杂（main.py 单文件即混用 CRLF 与 LF）。
+# 禁用 git 的行尾转换，使文件保持字节原样：任何自动归一化都会产生
+# 覆盖整个文件的假 diff，从而摧毁 diff、回滚与 blame 的价值。
+* -text
+
+*.ttf binary
+*.png binary

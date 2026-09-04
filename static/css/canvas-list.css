@@ -1,0 +1,1743 @@
+@import url('/static/vendor/css/fonts.css?v=2026.05.22.1');
+/* ===== Theme variables ===== */
+/* 单一 dark 主题：浅色 :root 色板已移除；主题色由 .theme-dark/body.theme-dark/html.theme-dark:has(.workspace) 与 button-glass.css 提供。--ease 为无主题无关缓动 token，保留。 */
+:root{
+  --ease:cubic-bezier(.4,0,.2,1);
+}
+.theme-dark{
+  /* 仅保留 body 层未被 theme.css/body.theme-dark 覆盖的 8 个承重 token */
+  --grid:rgba(148,163,184,.18);
+  --grid-line:rgba(148,163,184,.055);
+  --panel-solid:#111823;
+  --accent-soft:rgba(56,189,248,.14);
+  --accent-line:rgba(56,189,248,.36);
+  --success:#34d399;
+  --danger:#fb7185;
+  --danger-soft:rgba(251,113,133,.14);
+  color-scheme:dark;
+}
+*{box-sizing:border-box;}
+body{margin:0;height:100vh;overflow:hidden;background:var(--page);color:var(--text);font-family:'Inter',-apple-system,sans-serif;-webkit-font-smoothing:antialiased;}
+/* ===== Workspace shell (two pane) ===== */
+.workspace{position:relative;display:flex;height:100vh;overflow:hidden;}
+html[data-studio-scale="off"].studio-scale-managed .workspace{
+  width:100%;
+  height:calc(100vh / var(--studio-ui-scale, 1));
+  zoom:var(--studio-ui-scale, 1);
+  flex-direction:row;
+}
+/* ===== LEFT sidebar ===== */
+.ws-sidebar{flex:0 0 272px;width:272px;display:flex;flex-direction:column;background:var(--av-mother-surface)!important;border-right:1px solid var(--line);border-left:0;-webkit-backdrop-filter:var(--av-mother-panel-filter)!important;backdrop-filter:var(--av-mother-panel-filter)!important;box-shadow:none;}
+.ws-side-head{display:flex;align-items:center;justify-content:space-between;padding:18px 16px 12px;}
+.ws-side-title{font-size:15px;font-weight:850;letter-spacing:0;color:var(--text);}
+.ws-side-add{width:32px;height:32px;border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;color:var(--muted);background:var(--panel-solid);border:1px solid var(--line);transition:all .15s var(--ease);cursor:default;}
+.ws-icon-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+.ws-newproj-row{display:none;align-items:center;gap:4px;margin:0 12px 8px;padding:4px;border:1px solid var(--line);border-radius:var(--radius-md);background:var(--card-solid);box-shadow:0 8px 18px var(--shadow);}
+.ws-newproj-row.active{display:flex;}
+.ws-newproj-input{flex:1;min-width:0;height:30px;border:0;background:transparent;padding:0 8px;outline:none;color:var(--text);font-size:13px;font-weight:600;}
+.ws-mini-btn{width:30px;height:30px;flex:0 0 auto;border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;color:var(--muted);background:var(--soft);border:1px solid var(--line);cursor:default;transition:all .14s var(--ease);}
+.ws-mini-btn.primary{background:var(--strong);color:var(--strong-text);border-color:var(--strong);}
+.ws-project-list{flex:1;min-height:0;overflow:auto;padding:4px 10px 10px;display:flex;flex-direction:column;gap:4px;}
+.ws-project-row{position:relative;display:flex;width:100%;text-align:left;font:inherit;align-items:center;gap:9px;min-height:40px;padding:8px 10px;border-radius:var(--radius-md);cursor:default;border:0;transition:background .14s var(--ease), box-shadow .14s var(--ease);}
+.ws-project-row.drag-over{background:var(--accent-soft) !important;outline:2px solid var(--accent);outline-offset:-2px;}
+.ws-project-row.active{background:var(--strong);box-shadow:none;outline:none;}
+.ws-project-row.active::before{display:none;}
+.ws-project-row.active .ws-project-name{color:var(--strong-text);}
+.ws-project-row.active .ws-project-icon{color:var(--strong-text);opacity:.96;}
+.ws-project-icon{flex:0 0 auto;width:18px;height:18px;display:flex;align-items:center;justify-content:center;color:var(--faint);}
+.ws-project-name{flex:1;min-width:0;font-size:13px;font-weight:700;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.ws-project-name-input{flex:1;min-width:0;font-size:13px;font-weight:700;color:var(--text);background:var(--card-solid);border:1px solid var(--line-2);border-radius:var(--radius-7);padding:3px 6px;outline:none;}
+.ws-project-count{flex:0 0 auto;min-width:20px;height:20px;padding:0 6px;border-radius:var(--radius-full);display:inline-flex;align-items:center;justify-content:center;background:var(--soft-2);color:var(--muted);font-size:10px;font-weight:800;}
+.ws-project-row.active .ws-project-count{background:var(--white-a16);color:var(--strong-text);}
+.ws-project-actions{display:none;align-items:center;gap:2px;flex:0 0 auto;}
+.ws-project-row:hover .ws-project-actions{display:flex;}
+.ws-project-row:hover .ws-project-count{display:none;}
+.ws-proj-act{width:22px;height:22px;border-radius:var(--radius-7);display:flex;align-items:center;justify-content:center;color:var(--faint);background:transparent;border:none;cursor:default;transition:all .13s var(--ease);}
+.ws-project-row.active .ws-proj-act{color:rgba(255,255,255,.9);background:var(--white-a10);}
+/* delete-confirm inline */
+.ws-project-confirm{display:flex;flex-direction:column;gap:7px;padding:10px;margin:2px 0;border-radius:var(--radius-md);background:var(--strong);box-shadow:0 10px 24px var(--shadow);}
+.ws-project-confirm-title{color:var(--strong-text);font-size:11px;font-weight:800;line-height:1.4;}
+.ws-project-confirm-actions{display:flex;gap:6px;}
+.ws-confirm-btn,.ws-cancel-btn{flex:1;height:26px;border-radius:var(--radius-full);font-size:11px;font-weight:800;cursor:default;border:none;}
+.ws-confirm-btn{background:var(--red-600);color:var(--white);}
+.ws-confirm-btn:hover{background:#b91c1c;}
+.ws-cancel-btn{background:var(--soft);color:var(--text);border:1px solid var(--line);}
+.ws-side-foot{padding:10px 12px;border-top:1px solid var(--line);background:linear-gradient(180deg, transparent, rgba(100,116,139,.04));}
+.ws-trash-entry{width:100%;display:flex;align-items:center;gap:9px;min-height:40px;padding:8px 10px;border-radius:var(--radius-md);color:var(--muted);background:transparent;border:1px solid transparent;cursor:default;transition:all .14s var(--ease);font-size:13px;font-weight:750;}
+.ws-trash-entry.active{color:var(--text);background:var(--danger-soft);border-color:rgba(220,38,38,.22);}
+.ws-trash-label{flex:1;text-align:left;}
+.ws-trash-badge{min-width:18px;height:18px;padding:0 6px;border-radius:var(--radius-full);display:none;align-items:center;justify-content:center;background:#475569;color:var(--white);font-size:10px;font-weight:800;}
+.ws-trash-badge.visible{display:inline-flex;}
+/* ===== RIGHT main / board ===== */
+.ws-main{position:relative;flex:1;min-width:0;display:flex;flex-direction:column;overflow:hidden;}
+.ws-icon-btn{width:36px;height:36px;border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;color:var(--muted);background:var(--card-solid);border:1px solid var(--line);cursor:default;transition:all .15s var(--ease);}
+.ws-icon-btn:hover{color:var(--text);border-color:var(--line-2);background:var(--soft);box-shadow:0 6px 14px var(--shadow);}
+/* 粘贴到此项目：剪切后才出现的强调按钮，固定高对比色避免主题变量冲淡文字。 */
+.ws-paste-btn{height:36px;padding:0 13px;border-radius:var(--radius-md);display:inline-flex;align-items:center;justify-content:center;gap:7px;background:#1d4ed8;color:var(--white);border:1px solid rgba(255,255,255,.18);cursor:default;font-size:12px;font-weight:850;box-shadow:0 8px 18px rgba(37,99,235,.28);}
+.ws-paste-btn span{color:inherit;}
+.ws-paste-btn svg{width:16px;height:16px;color:inherit;stroke:currentColor;}
+.theme-dark .ws-paste-btn{background:#2563eb;color:var(--white);border-color:rgba(147,197,253,.28);box-shadow:0 10px 24px rgba(37,99,235,.34);}
+.ws-board{position:relative;flex:1;min-height:0;overflow:hidden;background:var(--page);background-image:linear-gradient(var(--grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--grid-line) 1px, transparent 1px), radial-gradient(var(--grid) 1px, transparent 1px);background-size:120px 120px, 120px 120px, 24px 24px;cursor:default;user-select:none;}
+.ws-board-world{position:absolute;left:0;top:0;transform-origin:0 0;will-change:transform;}
+/* ===== Board card ===== */
+.ws-card{
+  position:absolute;
+  width:248px;
+  height:150px;
+  border-radius:var(--radius-md);
+  background:var(--card-solid);
+  border:1px solid var(--line);
+  box-shadow:0 6px 18px rgba(15,23,42,.06);
+  padding:14px;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  cursor:default;
+  overflow:hidden;
+  transition:box-shadow .16s var(--ease), border-color .16s var(--ease), transform .16s var(--ease), background .16s var(--ease);
+}
+.ws-card::before{display:none;}
+.ws-card:hover{border-color:var(--line-2);box-shadow:0 16px 36px var(--shadow-strong);transform:translateY(-2px);}
+.ws-card.dragging{box-shadow:0 20px 48px var(--shadow-strong);border-color:var(--line-2);transform:none;z-index:50;cursor:default;transition:none;}
+.ws-card.cc-marked{border-color:var(--line-2);}
+.ws-card.cut{opacity:.56;border-style:dashed;}
+.ws-card-top{display:flex;align-items:center;gap:8px;min-height:28px;flex:0 0 auto;min-width:0;white-space:nowrap;overflow:hidden;}
+.ws-card-icon{width:30px;height:30px;flex:0 0 auto;border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;background:var(--soft);color:var(--muted);border:1px solid var(--line);font-size:16px;}
+.ws-card-kind{display:inline-flex;align-items:center;justify-content:center;flex:0 1 auto;min-width:0;max-width:calc(100% - 36px);height:22px;padding:0 8px;border-radius:6px;font-size:10px;font-weight:850;letter-spacing:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ws-card-kind.smart{background:#f5f3ff;color:#6d28d9;border:1px solid #ddd6fe;}
+.ws-card-menu{margin-left:auto;width:28px;height:28px;flex:0 0 28px;border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;color:var(--faint);background:transparent;border:1px solid transparent;cursor:default;opacity:.58;transition:all .14s var(--ease);}
+.ws-card:hover .ws-card-menu,.ws-card:focus-within .ws-card-menu{opacity:1;}
+.ws-card-title{font-size:15px;line-height:1.35;font-weight:800;letter-spacing:0;color:var(--text);overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;word-break:break-word;}
+.ws-card-title-input{font-size:15px;line-height:1.35;font-weight:800;color:var(--text);background:var(--card-solid);border:1px solid var(--line-2);border-radius:var(--radius-md);padding:5px 7px;outline:none;width:100%;}
+.ws-card-meta{margin-top:auto;display:flex;align-items:center;gap:6px;align-self:stretch;min-width:0;padding:9px 10px;border-radius:var(--radius-md);background:var(--soft);border:1px solid var(--line);}
+.ws-card-meta-dot{width:4px;height:4px;flex:0 0 auto;border-radius:50%;background:var(--faint);opacity:.7;}
+.ws-card-time{min-width:0;font-size:11px;font-weight:650;color:var(--muted);letter-spacing:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ws-card-nodes{font-size:11px;font-weight:750;color:var(--muted);white-space:nowrap;}
+.ws-card-actions{display:flex;gap:7px;margin-top:auto;}
+.ws-card-delete-confirm{display:none;flex-direction:column;gap:8px;margin-top:auto;padding:8px;border-radius:var(--radius-md);background:var(--danger-soft);border:1px solid rgba(220,38,38,.2);}
+.ws-card.confirming-delete .ws-card-title,
+.ws-card.confirming-delete .ws-card-meta{display:none;}
+.ws-card.confirming-delete .ws-card-delete-confirm{display:flex;}
+.ws-card-delete-title{font-size:12px;line-height:1.45;font-weight:800;color:var(--text);}
+.ws-card-delete-actions{display:flex;gap:7px;}
+.ws-card-delete-actions button{flex:1;height:30px;border-radius:var(--radius-md);border:1px solid var(--line);cursor:default;font-size:12px;font-weight:800;}
+.ws-card-delete-yes{background:var(--danger);color:var(--white);border-color:var(--danger);}
+.ws-card-delete-no{background:var(--card-solid);color:var(--muted);}
+/* ===== Card context menu ===== */
+.ws-card-pop{position:fixed;left:0;top:0;z-index:200;width:214px;padding:6px;border-radius:var(--radius-md);border:1px solid var(--line);background:var(--card-solid);color:var(--text);box-shadow:0 22px 54px var(--shadow-strong);display:flex;flex-direction:column;gap:1px;}
+.ws-pop-item{display:flex;align-items:center;gap:9px;width:100%;padding:8px 10px;border-radius:var(--radius-md);background:transparent;border:none;cursor:default;color:var(--text);font-size:12.5px;font-weight:700;text-align:left;transition:background .12s var(--ease);}
+.ws-pop-item:hover{background:var(--soft);}
+.ws-pop-item.danger{color:var(--danger);}
+.ws-pop-item.danger:hover{background:var(--danger-soft);}
+.ws-pop-sep{height:1px;margin:3px 4px;background:var(--line);}
+/* ===== Inline card create flow (on board) ===== */
+.ws-create-card{position:absolute;width:260px;border-radius:var(--radius-md);background:var(--card-solid);border:1px solid var(--line-2);box-shadow:0 18px 44px var(--shadow-strong);padding:12px;display:flex;flex-direction:column;gap:10px;z-index:60;}
+.ws-create-title{font-size:12px;font-weight:850;color:var(--text);}
+.ws-create-input{width:100%;height:34px;border-radius:var(--radius-md);border:1px solid var(--line);background:var(--soft);color:var(--text);font-size:13px;font-weight:600;padding:0 10px;outline:none;}
+.ws-create-input:focus{border-color:var(--line-2);background:var(--card-solid);}
+.ws-create-actions{display:flex;gap:6px;}
+.ws-create-confirm,.ws-create-cancel{flex:1;height:32px;border-radius:var(--radius-md);font-size:12px;font-weight:800;cursor:default;border:none;}
+.ws-create-confirm{background:var(--strong);color:var(--strong-text);}
+.ws-create-cancel{background:var(--soft);color:var(--muted);border:1px solid var(--line);}
+/* ===== Trash panel ===== */
+.ws-trash-panel{position:absolute;inset:0;z-index:20;display:none;flex-direction:column;background:var(--page);}
+.ws-trash-panel.active{display:flex;}
+.ws-trash-head{display:flex;align-items:center;justify-content:space-between;min-height:60px;padding:11px 18px;border-bottom:1px solid var(--line);background:var(--av-mother-surface)!important;-webkit-backdrop-filter:var(--av-mother-panel-filter)!important;backdrop-filter:var(--av-mother-panel-filter)!important;}
+.ws-trash-head-title{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:850;color:var(--text);}
+.ws-trash-note{display:flex;align-items:center;gap:7px;margin:14px 18px 0;padding:10px 12px;border-radius:var(--radius-md);background:var(--accent-soft);color:var(--accent);border:1px solid var(--accent-line);font-size:12px;font-weight:700;}
+.ws-trash-list{flex:1;min-height:0;overflow:auto;padding:16px 18px 24px;display:grid;grid-template-columns:repeat(auto-fill, minmax(248px, 1fr));gap:14px;align-content:start;}
+.ws-trash-empty{grid-column:1/-1;min-height:280px;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--faint);font-size:14px;font-weight:750;}
+.ws-trash-card{position:relative;border-radius:var(--radius-md);background:var(--card-solid);border:1px solid var(--line);padding:14px;display:flex;flex-direction:column;gap:12px;min-height:150px;box-shadow:0 6px 18px rgba(15,23,42,.06);overflow:hidden;}
+.ws-trash-card::before{display:none;}
+.ws-trash-card .ws-card-actions{display:flex;gap:6px;margin-top:auto;}
+.ws-trash-act{flex:1;height:32px;border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;gap:5px;font-size:11.5px;font-weight:800;cursor:default;border:1px solid var(--line);background:var(--soft);color:var(--muted);transition:all .14s var(--ease);}
+.ws-trash-act.restore:hover{color:var(--success);background:#ecfdf5;border-color:#a7f3d0;}
+.ws-trash-act.purge:hover{color:var(--danger);background:var(--danger-soft);border-color:var(--red-200);}
+.ws-trash-card.confirming .ws-card-actions{display:none;}
+.ws-trash-confirm{display:none;flex-direction:column;gap:8px;margin-top:auto;padding:8px;border-radius:var(--radius-md);background:var(--danger-soft);border:1px solid rgba(220,38,38,.2);}
+.ws-trash-card.confirming .ws-trash-confirm{display:flex;}
+.ws-trash-confirm-title{font-size:11px;font-weight:800;color:var(--text);}
+.ws-trash-confirm-actions{display:flex;gap:6px;}
+.ws-trash-confirm-actions button{flex:1;height:30px;border-radius:var(--radius-md);font-size:11px;font-weight:800;cursor:default;border:none;}
+.ws-trash-confirm-yes{background:var(--danger);color:var(--white);}
+.ws-trash-confirm-no{background:var(--soft);color:var(--muted);border:1px solid var(--line);}
+/* ===== Status toast ===== */
+.ws-status{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);z-index:30;padding:8px 16px;border-radius:var(--radius-full);background:var(--strong);color:var(--strong-text);font-size:12px;font-weight:700;box-shadow:0 10px 30px var(--shadow);opacity:0;pointer-events:none;transition:opacity .2s var(--ease);}
+.ws-status.show{opacity:1;}
+/* ===== Dark theme adjustments ===== */
+.theme-dark .ws-trash-note{background:var(--accent-soft);color:#bfdbfe;border-color:var(--accent-line);}
+.theme-dark .ws-project-row.active{background:var(--color-d8dee9);color:var(--slate-900);}
+.theme-dark .ws-project-row.active .ws-project-name,
+.theme-dark .ws-project-row.active .ws-project-icon,
+.theme-dark .ws-project-row.active .ws-project-count{color:var(--slate-900);}
+.theme-dark .ws-project-row.active .ws-project-count{background:rgba(15,23,42,.12);}
+.theme-dark .ws-project-row.active .ws-proj-act{color:#1f2937;background:rgba(15,23,42,.08);}
+.theme-dark .ws-mini-btn.primary{background:var(--color-d8dee9);color:var(--slate-900);border-color:var(--color-d8dee9);}
+.theme-dark .ws-card-kind.smart{background:rgba(139,92,246,.18);color:#c4b5fd;border-color:rgba(139,92,246,.3);}
+.theme-dark .ws-create-confirm{background:var(--color-d8dee9);color:var(--slate-900);}
+.theme-dark .ws-trash-act.restore:hover{color:#6ee7b7;background:rgba(5,150,105,.15);border-color:rgba(110,231,183,.35);}
+.theme-dark .ws-trash-act.purge:hover{color:var(--red-200);background:rgba(220,38,38,.18);border-color:rgba(248,113,113,.35);}
+.theme-dark .ws-pop-item.danger:hover{background:rgba(220,38,38,.18);}
+.theme-dark .ws-card-delete-no{background:var(--soft);}
+/* ===== Responsive ===== */
+@media (max-width:760px){
+  .workspace{flex-direction:column;}
+  .ws-sidebar{flex:0 0 auto;width:100%;max-height:42vh;border-right:none;border-bottom:1px solid var(--line);}
+  .ws-side-head{padding:12px 12px 8px;}
+  .ws-project-list{padding:4px 8px 8px;}
+  .ws-main{min-height:0;}
+  .ws-paste-btn span{display:none;}
+  .ws-card{width:230px;height:146px;padding:12px;gap:10px;}
+  .ws-card-top{gap:6px;min-height:26px;}
+  .ws-card-kind{height:20px;max-width:calc(100% - 32px);padding:0 7px;font-size:9.5px;}
+  .ws-card-menu{width:26px;height:26px;flex-basis:26px;opacity:1;}
+  .ws-card-title{font-size:14px;}
+  .ws-card-meta{padding:8px;gap:5px;}
+  .ws-trash-list{grid-template-columns:1fr;padding:12px;}
+  .ws-trash-note{margin:12px 12px 0;}
+}
+html[data-studio-scale="off"].studio-scale-managed .ws-sidebar{
+  flex:0 0 272px;
+  width:272px;
+  max-height:none;
+  border-right:1px solid var(--line);
+  border-bottom:none;
+}
+html[data-studio-scale="off"].studio-scale-managed .ws-main{
+  min-width:0;
+  min-height:0;
+}
+html[data-studio-scale="off"].studio-scale-managed .ws-paste-btn span{
+  display:inline;
+}
+/* Launcher view: a stable, scannable home surface. Free layout remains available. */
+.launcher-world{position:relative;width:100%;min-height:100%;display:grid;align-content:start;transform:none !important;}
+.launcher-world .ws-card{position:relative;left:auto;top:auto;width:auto;min-width:0;padding:0;gap:0;cursor:default;}
+.launcher-world .ws-card-cover{position:relative;flex:0 0 156px;overflow:hidden;border-bottom:1px solid var(--line);}
+.launcher-world .ws-card-cover-image{display:block;width:100%;height:100%;object-fit:cover;}
+.launcher-world .ws-card-cover-empty{width:100%;height:100%;display:flex;align-items:center;justify-content:center;}
+.launcher-world .ws-card-cover-empty svg{opacity:.72;}
+.launcher-world .ws-card-kind{position:absolute;left:10px;top:10px;z-index:2;height:22px;background:rgba(11,16,23,.78);color:#bae6fd;border-color:rgba(125,211,252,.3);backdrop-filter: var(--av-mother-compact-filter);}
+.launcher-world .ws-card-menu{position:absolute;z-index:3;margin:0;color:#e2e8f0;background:rgba(11,16,23,.66);backdrop-filter: var(--av-mother-compact-filter);}
+.launcher-world .ws-card-body{min-width:0;display:flex;flex-direction:column;flex:1 1 auto;}
+.launcher-world .ws-card-meta{margin-top:auto;}
+.launcher-world .ws-card-cover-image[src$=".mp4"], .launcher-world .ws-card-cover-image[src$=".webm"]{object-fit:cover;}
+.theme-dark .launcher-world .ws-card-meta{background:rgba(11,16,23,.6);}
+@media (max-width:900px){
+  .launcher-world{grid-template-columns:repeat(auto-fill, minmax(220px, 1fr));padding:18px 14px 48px;gap:14px;}
+}
+/* Launcher-only homepage */
+.ws-home-tools{
+  top:18px;
+  right:22px;
+}
+.ws-home-tools .ws-icon-btn{text-decoration:none;background:var(--panel-solid);box-shadow:0 8px 20px var(--shadow);}
+.launcher-board{cursor:default;overflow:auto;}
+.ws-new-canvas-card,
+.launcher-world .launcher-create-card{
+  position:relative;
+  left:auto;
+  top:auto;
+  width:auto;
+  min-width:0;
+}
+.ws-new-canvas-card{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  padding:24px;
+  border:1px dashed var(--line-2);
+  cursor:default;
+  transition:transform .16s var(--ease), border-color .16s var(--ease), color .16s var(--ease), background .16s var(--ease), box-shadow .16s var(--ease);
+}
+.ws-new-canvas-card:hover{
+  color:var(--text);
+  transform:translateY(-3px);
+}
+.ws-new-canvas-create{width:100%;display:flex;flex:1;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:0;color:inherit;background:transparent;border:0;}
+.ws-new-canvas-card[hidden]{display:none;}
+.ws-new-canvas-icon{
+  width:48px;
+  height:48px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:14px;
+  color:var(--accent);
+  border:1px solid var(--accent-line);
+}
+.ws-new-canvas-icon svg{width:23px;height:23px;}
+.ws-new-canvas-title{font-size:14px;font-weight:850;color:var(--text);}
+.ws-new-canvas-sub{font-size:11px;font-weight:650;color:var(--muted);text-align:center;}
+.launcher-world .launcher-create-card{
+  box-sizing:border-box;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap:14px;
+  padding:22px;
+}
+@media (max-width:560px){
+  .ws-home-tools{top:12px;right:12px;}
+}
+
+.launcher-world .ws-card.dragging{opacity:.48;transform:scale(.985);cursor:default;}
+.launcher-world .ws-card-drag-placeholder{
+  box-sizing:border-box;
+  min-width:0;
+  border:1px dashed rgba(34,211,238,.62);
+  border-radius:var(--radius-xl);
+  background:rgba(34,211,238,.08);
+  box-shadow:inset 0 0 0 1px rgba(34,211,238,.12);
+  pointer-events:none;
+}
+
+
+.launcher-world .ws-card.drop-before::after,
+.launcher-world .ws-card.drop-after::after{content:"";position:absolute;left:12px;right:12px;z-index:8;height:3px;border-radius:var(--radius-full);background:#22d3ee;box-shadow:0 0 0 2px rgba(34,211,238,.18), 0 0 14px rgba(34,211,238,.7);pointer-events:none;}
+.launcher-world .ws-card.drop-before::after{top:-10px;}
+.launcher-world .ws-card.drop-after::after{bottom:-10px;}
+/* Do not squeeze destructive-action buttons below the cover on a narrow card. */
+.launcher-world .ws-card.confirming-delete{height:232px;min-height:232px;}
+.launcher-world .ws-card.confirming-delete .ws-card-cover,
+.launcher-world .ws-card.confirming-delete .ws-card-body{display:none;}
+.launcher-world .ws-card.confirming-delete .ws-card-delete-confirm{display:flex;flex:1 1 auto;justify-content:space-between;gap:14px;margin:0;padding:18px;border:0;border-radius:14px;}
+.launcher-world .ws-card.confirming-delete .ws-card-delete-title{font-size:14px;}
+.launcher-world .ws-card.confirming-delete .ws-card-delete-actions{display:flex;flex:0 0 auto;gap:8px;}
+.launcher-world .ws-card.confirming-delete .ws-card-delete-actions button{min-width:74px;height:34px;}
+@media (max-width:560px){
+  .launcher-world .ws-card.confirming-delete{height:220px;min-height:220px;}
+  .launcher-world .ws-card.confirming-delete .ws-card-delete-confirm{padding:14px;flex-direction:column;align-items:stretch;}
+  .launcher-world .ws-card.confirming-delete .ws-card-delete-actions button{min-width:0;}
+}
+/* Launcher polish: compact project controls and a calmer, more tactile canvas gallery. */
+.ws-side-actions{display:flex;align-items:center;gap:6px;}
+.ws-side-settings{
+  width:32px;
+  height:32px;
+  flex:0 0 32px;
+  border-radius:var(--radius-md);
+  text-decoration:none;
+  background:var(--panel-solid);
+}
+.ws-side-settings:hover{text-decoration:none;}
+/* The standalone settings button moved into the sidebar, so the gallery can begin closer to the top. */
+.launcher-world{
+  padding-top:56px;
+  padding-bottom:72px;
+}
+.launcher-world .ws-card,
+.ws-new-canvas-card,
+.launcher-world .launcher-create-card{
+  min-height:238px;
+  border-radius:var(--radius-xl);
+}
+.launcher-world .ws-card{
+  isolation:isolate;
+  border-color:rgba(148,163,184,.20);
+  background:linear-gradient(155deg, rgba(25,34,48,.98), rgba(17,24,35,.98));
+  box-shadow:0 10px 28px var(--black-a22), inset 0 1px 0 var(--white-a3);
+  transition:transform .2s var(--ease), border-color .2s var(--ease), box-shadow .2s var(--ease);
+}
+.launcher-world .ws-card::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:4;
+  border:1px solid var(--white-a4);
+  border-radius:inherit;
+  pointer-events:none;
+}
+.launcher-world .ws-card:hover,
+.launcher-world .ws-card:focus-within{
+  transform:translateY(-6px);
+  border-color:rgba(125,211,252,.46);
+  box-shadow:0 18px 42px var(--black-a34), 0 0 0 1px rgba(56,189,248,.08), inset 0 1px 0 rgba(255,255,255,.05);
+}
+.launcher-world .ws-card-cover{
+  height:158px;
+  flex-basis:158px;
+  border-bottom-color:rgba(148,163,184,.16);
+  background:#101722;
+}
+.launcher-world .ws-card-cover::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:1;
+  pointer-events:none;
+  background:linear-gradient(180deg, rgba(3,7,18,.02) 40%, rgba(3,7,18,.20) 100%);
+}
+.launcher-world .ws-card-cover-image{
+  transition:transform .42s cubic-bezier(.22,.61,.36,1), filter .42s var(--ease);
+}
+.launcher-world .ws-card:hover .ws-card-cover-image,
+.launcher-world .ws-card:focus-within .ws-card-cover-image{
+  transform:scale(1.025);
+  filter:saturate(1.04) contrast(1.015);
+}
+.launcher-world .ws-card-cover-empty{
+  color:rgba(186,230,253,.72);
+  background:radial-gradient(circle at 50% 36%, rgba(56,189,248,.16), transparent 42%),
+        linear-gradient(145deg, #182334, #0d1420);
+}
+.launcher-world .ws-card-cover-empty::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  opacity:.32;
+  background-image:linear-gradient(rgba(125,211,252,.10) 1px, transparent 1px), linear-gradient(90deg, rgba(125,211,252,.10) 1px, transparent 1px);
+  background-size:18px 18px;
+}
+.launcher-world .ws-card-cover-empty svg{position:relative;z-index:1;width:28px;height:28px;}
+.launcher-world .ws-card-menu{
+  right:10px;
+  top:10px;
+  opacity:.42;
+  border-color:rgba(226,232,240,.16);
+  box-shadow:0 4px 14px var(--black-a16);
+}
+.launcher-world .ws-card:hover .ws-card-menu,
+.launcher-world .ws-card:focus-within .ws-card-menu{opacity:1;}
+.launcher-world .ws-card-body{padding:13px 14px 14px;gap:8px;}
+.launcher-world .ws-card-title{font-size:14px;line-height:1.3;letter-spacing:-.01em;}
+.launcher-world .ws-card-meta{
+  padding:7px 9px;
+  border-radius:var(--radius-md);
+  border-color:rgba(148,163,184,.16);
+  background:rgba(6,11,20,.46);
+  font-variant-numeric:tabular-nums;
+}
+.ws-new-canvas-card{
+  color:rgba(203,213,225,.78);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.022);
+}
+.ws-new-canvas-card:hover{
+  background:linear-gradient(145deg, rgba(23,38,55,.96), rgba(13,22,34,.98));
+}
+.ws-new-canvas-icon{
+  background:rgba(56,189,248,.11);
+  border-color:rgba(125,211,252,.28);
+}
+@media (max-width:560px){
+  .launcher-world{padding-top:52px;gap:14px;}
+  .launcher-world .ws-card,
+    .ws-new-canvas-card,
+    .launcher-world .launcher-create-card{height:220px;min-height:220px;}
+  .launcher-world .ws-card-cover{height:142px;flex-basis:142px;}
+}
+.launcher-world .ws-card.dragging{border-color:rgba(34,211,238,.72);box-shadow:0 0 0 2px rgba(34,211,238,.16),0 18px 42px rgba(0,0,0,.32);}
+.ws-new-canvas-card{border-style:dashed;border-color:rgba(34,211,238,.34);background:linear-gradient(145deg,rgba(15,23,42,.76),rgba(19,25,36,.94));}
+.ws-new-canvas-card:hover{border-color:rgba(34,211,238,.68);box-shadow:0 0 0 3px rgba(34,211,238,.10),0 18px 42px rgba(0,0,0,.28);}
+body.theme-dark{
+  /* 仅保留 theme.css 未覆盖的 6 个承重 token；其余 9 个已被 body.studio-theme-dark 覆盖 */
+  --muted:#aeb8bf;
+  --faint:#858f97;
+  --strong:#b9dce8;
+  --strong-text:#071218;
+  --shadow:rgba(0,0,0,.52);
+  --shadow-strong:rgba(0,0,0,.7);
+}
+body.theme-dark,.theme-dark .workspace,.theme-dark .ws-main{background:#050608;}
+.theme-dark .ws-sidebar,.theme-dark .ws-trash-head{
+  background:rgba(13,18,24,.66);
+  border-color:rgba(210,225,232,.13);
+  box-shadow:inset 0 1px 0 rgba(241,248,250,.1);
+}
+.theme-dark .launcher-world{background:#050608;background-image:linear-gradient(135deg,#050608 0%,#080d13 48%,#0c141c 76%,#050608 100%);}
+.theme-dark .launcher-world .ws-card,.theme-dark .ws-new-canvas-card,.theme-dark .ws-create-card,.theme-dark .ws-card-pop{
+  background:linear-gradient(145deg,rgba(53,63,72,.5),rgba(13,18,24,.82));
+  border-color:rgba(210,225,232,.16);
+  box-shadow:inset 0 1px 0 rgba(241,248,250,.12),0 8px 18px var(--black-a34);
+  backdrop-filter:blur(20px) saturate(130%);
+}
+.theme-dark .launcher-world .ws-card:hover,.theme-dark .launcher-world .ws-card:focus-within,.theme-dark .ws-new-canvas-card:hover{
+  border-color:rgba(215,234,240,.48);
+  box-shadow:inset 0 1px 0 rgba(248,252,253,.18),0 12px 20px rgba(0,0,0,.46),0 0 12px rgba(121,203,232,.09);
+}
+.theme-dark .launcher-world .ws-card-cover-empty{background:linear-gradient(145deg,rgba(71,85,95,.64),rgba(13,18,24,.94));}
+.theme-dark .ws-new-canvas-card{border-style:solid;}
+/* 已移除死 html 层色板：这 22 个 token 在 <body> 层被 theme.css/body.theme-dark/.theme-dark 全部覆盖，实际渲染不消费 <html> 层值。 */
+html.theme-dark:has(.workspace) body,
+html.theme-dark:has(.workspace) body .workspace,
+html.theme-dark:has(.workspace) body .ws-main{
+  color:var(--text);
+  background:#050608 !important;
+}
+html.theme-dark:has(.workspace) body .ws-side-head{
+  padding:18px 16px 13px;
+  border-bottom:1px solid rgba(255,255,255,.045);
+}
+html.theme-dark:has(.workspace) body .ws-side-title{
+  color:#e9ebe9;
+  font-size:14px;
+  font-weight:780;
+  letter-spacing:.02em;
+}
+html.theme-dark:has(.workspace) body .ws-side-actions{gap:7px;}
+html.theme-dark:has(.workspace) body .ws-side-settings,
+html.theme-dark:has(.workspace) body .ws-side-add{
+  width:32px;
+  height:32px;
+  flex-basis:32px;
+  border-radius:var(--radius-9);
+}
+html.theme-dark:has(.workspace) body .ws-project-list{
+  padding:9px 10px 12px;
+  gap:5px;
+}
+html.theme-dark:has(.workspace) body .ws-project-row{
+  min-height:40px;
+  padding:8px 10px;
+  border:1px solid transparent;
+  border-radius:var(--radius-10);
+  color:var(--muted);
+  background:transparent;
+  box-shadow:none;
+}
+html.theme-dark:has(.workspace) body .ws-project-row:hover{
+  color:var(--text);
+  background:rgba(255,255,255,.042) !important;
+  border-color:rgba(255,255,255,.072);
+  box-shadow:inset 0 1px 0 var(--white-a4);
+}
+html.theme-dark:has(.workspace) body .ws-project-row.active .ws-project-name,
+html.theme-dark:has(.workspace) body .ws-project-row.active .ws-project-icon,
+html.theme-dark:has(.workspace) body .ws-project-row.active .ws-project-count,
+html.theme-dark:has(.workspace) body .ws-project-row.active .ws-proj-act{
+  color:#f0f2f0;
+}
+html.theme-dark:has(.workspace) body .ws-project-count,
+html.theme-dark:has(.workspace) body .ws-trash-badge{
+  color:#b7bdbb;
+  background:rgba(255,255,255,.065);
+  border:1px solid rgba(255,255,255,.065);
+}
+html.theme-dark:has(.workspace) body .ws-side-foot{
+  padding:11px 12px 13px;
+  border-top-color:var(--white-a7);
+  background:linear-gradient(180deg,transparent,var(--white-a2));
+}
+html.theme-dark:has(.workspace) body .ws-trash-entry{
+  min-height:40px;
+  border-radius:var(--radius-10);
+  border-color:transparent !important;
+}
+html.theme-dark:has(.workspace) body .ws-trash-entry:hover{
+  color:#eceeed;
+  background:rgba(255,255,255,.042) !important;
+  border-color:rgba(255,255,255,.072) !important;
+}
+html.theme-dark:has(.workspace) body .launcher-board,
+html.theme-dark:has(.workspace) body .launcher-world{
+  background-size:24px 24px,24px 24px,auto,auto;
+  background-position:0 0,0 0,0 0,0 0 !important;
+  background-image:none;
+  background-color:transparent;
+}
+html.theme-dark:has(.workspace) body .launcher-world{
+  padding-top:58px;
+  padding-bottom:68px;
+  gap:18px;
+}
+html.theme-dark:has(.workspace) body .launcher-world .ws-card,
+html.theme-dark:has(.workspace) body .ws-new-canvas-card,
+html.theme-dark:has(.workspace) body .launcher-world .launcher-create-card,
+html.theme-dark:has(.workspace) body .ws-card-pop,
+html.theme-dark:has(.workspace) body .ws-trash-card,
+html.theme-dark:has(.workspace) body .ws-newproj-row{
+  background:linear-gradient(151deg,rgba(255,255,255,.075),rgba(255,255,255,.012) 27%,transparent 52%),
+        radial-gradient(ellipse 88% 58% at 4% 0%,rgba(190,224,233,.028),transparent 70%),
+        linear-gradient(145deg,rgba(27,29,31,.56),rgba(8,10,12,.72)) !important;
+  border-color:rgba(255,255,255,.115) !important;
+  box-shadow:0 15px 36px var(--black-a30),inset 0 1px 0 rgba(255,255,255,.125),inset 0 -1px 0 var(--black-a30);
+  -webkit-backdrop-filter:blur(20px) saturate(.82) brightness(.96) !important;
+  backdrop-filter:blur(20px) saturate(.82) brightness(.96);
+}
+html.theme-dark:has(.workspace) body .launcher-world .ws-card:hover,
+html.theme-dark:has(.workspace) body .launcher-world .ws-card:focus-within{
+  transform:translateY(-1px) !important;
+  border-color:rgba(225,239,242,.25) !important;
+}
+html.theme-dark:has(.workspace) body .launcher-world .ws-card.selected,
+html.theme-dark:has(.workspace) body .launcher-world .ws-card.selected:hover,
+html.theme-dark:has(.workspace) body .launcher-world .ws-card.selected:focus-within{
+  transform:translateY(-1px) !important;
+  border-color:rgba(205,232,238,.40) !important;
+  background:linear-gradient(151deg,rgba(214,239,244,.11),var(--white-a2) 30%,transparent 55%),
+        radial-gradient(ellipse 90% 60% at 4% 0%,rgba(161,215,229,.065),transparent 70%),
+        linear-gradient(145deg,rgba(31,35,37,.64),rgba(8,11,13,.76)) !important;
+  box-shadow:0 18px 42px rgba(0,0,0,.36),0 0 0 1px rgba(183,222,231,.075),0 0 18px rgba(158,217,232,.055),inset 0 1px 0 rgba(255,255,255,.19) !important;
+}
+html.theme-dark:has(.workspace) body .launcher-world .ws-card-cover{
+  background:#0b0e11;
+}
+html.theme-dark:has(.workspace) body .launcher-world .ws-card-cover::after{
+  background:linear-gradient(180deg,rgba(3,5,7,.01) 42%,rgba(3,5,7,.25) 100%);
+}
+html.theme-dark:has(.workspace) body .launcher-world .ws-card-cover-empty{
+  color:#ced2cf;
+  background-image:linear-gradient(rgba(255,255,255,.038) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(255,255,255,.038) 1px,transparent 1px),
+        radial-gradient(circle at 50% 38%,rgba(255,255,255,.06),transparent 46%),
+        linear-gradient(145deg,#16191c,#090b0d);
+  background-size:18px 18px,18px 18px,auto,auto;
+}
+html.theme-dark:has(.workspace) body .launcher-world .ws-card:hover .ws-card-cover-image,
+html.theme-dark:has(.workspace) body .launcher-world .ws-card:focus-within .ws-card-cover-image{
+  transform:scale(1.01);
+  filter:saturate(1.015) contrast(1.01);
+}
+html.theme-dark:has(.workspace) body .launcher-world .ws-card-menu{
+  background-color:rgba(9,11,13,.34);
+  border-radius:var(--radius-9);
+}
+html.theme-dark:has(.workspace) body .launcher-world .ws-card-menu:hover{
+  border-color:rgba(226,239,242,.25) !important;
+}
+html.theme-dark:has(.workspace) body .launcher-world .ws-card-body{
+  padding:13px 14px 14px;
+  border:0 !important;
+}
+html.theme-dark:has(.workspace) body .launcher-world .ws-card-meta{
+  min-height:24px;
+  padding:0 !important;
+  border:0 !important;
+  border-radius:0;
+  background:transparent !important;
+  box-shadow:none;
+}
+html.theme-dark:has(.workspace) body .launcher-world .ws-card-meta-default,
+html.theme-dark:has(.workspace) body .launcher-world .ws-card-selection-hint{
+  min-width:0;
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+html.theme-dark:has(.workspace) body .launcher-world .ws-card-selection-hint{
+  display:none;
+  font-size:11px;
+  font-weight:720;
+  letter-spacing:.01em;
+  white-space:nowrap;
+}
+html.theme-dark:has(.workspace) body .launcher-world .ws-card-selection-hint svg{
+  width:13px;
+  height:13px;
+  flex:0 0 13px;
+  opacity:1;
+  filter:drop-shadow(0 0 5px rgba(196,230,237,.18));
+}
+html.theme-dark:has(.workspace) body .launcher-world .ws-card.selected .ws-card-meta-default{display:none;}
+html.theme-dark:has(.workspace) body .launcher-world .ws-card.selected .ws-card-selection-hint{display:flex;}
+html.theme-dark:has(.workspace) body .launcher-world .ws-card-meta-dot{
+  width:3px;
+  height:3px;
+  background:#858c89;
+}
+html.theme-dark:has(.workspace) body .launcher-world .ws-card-nodes,
+html.theme-dark:has(.workspace) body .launcher-world .ws-card-time{color:#969d9a;}
+html.theme-dark:has(.workspace) body .ws-new-canvas-card{
+  color:#a9afac;
+  border-style:dashed !important;
+  border-radius:var(--radius-xl);
+}
+html.theme-dark:has(.workspace) body .ws-new-canvas-card:hover{
+  color:#eceeed;
+}
+html.theme-dark:has(.workspace) body .ws-new-canvas-title{
+  color:#ebedea;
+  margin-top:14px;
+  font-size:14px;
+  font-weight:720;
+}
+html.theme-dark:has(.workspace) body .ws-card-pop{
+  border-radius:var(--radius-lg);
+  padding:6px;
+}
+html.theme-dark:has(.workspace) body .ws-pop-item{
+  border-radius:var(--radius-md);
+}
+html.theme-dark:has(.workspace) body .ws-pop-item:hover{
+  background:rgba(255,255,255,.052) !important;
+}
+html.theme-dark:has(.workspace) body .ws-status{
+  color:#e1e4e1;
+  background:rgba(14,17,19,.78);
+  border:1px solid var(--white-a12);
+  box-shadow:0 14px 34px rgba(0,0,0,.36),inset 0 1px 0 rgba(255,255,255,.09);
+  -webkit-backdrop-filter:blur(18px);
+  backdrop-filter:blur(18px);
+}
+@media (max-width:560px){
+  html.theme-dark:has(.workspace) body .launcher-world{padding-top:54px;gap:14px;}
+  html.theme-dark:has(.workspace) body .launcher-world .ws-card-selection-hint{white-space:normal;}
+}
+html.theme-dark:has(.workspace) body .launcher-world .ws-card{
+  border-radius:18px !important;
+  will-change:transform;
+}
+html.theme-dark:has(.workspace) body .launcher-world .ws-card-cover,
+html.theme-dark:has(.workspace) body .launcher-world .ws-card-body{
+  position:relative;
+  z-index:2;
+}
+html.theme-dark:has(.workspace) body .launcher-world .ws-card-body{
+  background:linear-gradient(180deg,rgba(43,47,49,.38),rgba(13,15,17,.66) 72%,rgba(7,9,11,.76)) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.045);
+}
+html.theme-dark:has(.workspace) body .launcher-world .ws-card:hover:not(.dragging),
+html.theme-dark:has(.workspace) body .launcher-world .ws-card:focus-within:not(.dragging){
+  transform:translateY(-6px) scale(1.006) !important;
+}
+html.theme-dark:has(.workspace) body .launcher-world .ws-card:hover:not(.dragging) .ws-card-cover-image,
+html.theme-dark:has(.workspace) body .launcher-world .ws-card:focus-within:not(.dragging) .ws-card-cover-image{
+  transform:scale(1.022);
+  filter:saturate(.96) contrast(1.025) brightness(1.035);
+}
+html.theme-dark:has(.workspace) body .launcher-world .ws-card.selected:not(.dragging),
+html.theme-dark:has(.workspace) body .launcher-world .ws-card.selected:hover:not(.dragging),
+html.theme-dark:has(.workspace) body .launcher-world .ws-card.selected:focus-within:not(.dragging){
+  transform:translateY(-3px) scale(1.004) !important;
+  border-color:rgba(205,235,241,.68) !important;
+  background:radial-gradient(ellipse 116% 78% at 8% -12%,rgba(226,245,248,.23),rgba(178,218,227,.07) 38%,transparent 68%),
+        linear-gradient(150deg,rgba(71,82,85,.34),rgba(22,28,31,.75) 42%,rgba(7,10,12,.91) 100%) !important;
+  box-shadow:0 25px 56px rgba(0,0,0,.48),
+        0 8px 18px var(--black-a30),
+        0 0 0 1px rgba(205,235,241,.22),
+        0 0 0 3px rgba(145,207,221,.075),
+        0 0 30px rgba(155,216,230,.11),
+        inset 0 1px 0 rgba(255,255,255,.34),
+        inset 0 -1px 0 rgba(0,0,0,.50) !important;
+  animation:homepage-card-select-confirm .26s cubic-bezier(.2,.9,.25,1) both;
+}
+html.theme-dark:has(.workspace) body .launcher-world .ws-card.selected::after{
+  transform:translate3d(1%,0,0);
+}
+html.theme-dark:has(.workspace) body .launcher-world .ws-card:active:not(.dragging){
+  transform:translateY(0) scale(.992) !important;
+  transition-duration:.07s !important;
+  box-shadow:0 10px 24px rgba(0,0,0,.36),
+        inset 0 3px 9px var(--black-a34),
+        inset 0 1px 0 var(--white-a13) !important;
+}
+html.theme-dark:has(.workspace) body .launcher-world .ws-card.selected .ws-card-body{
+  background:linear-gradient(180deg,rgba(53,65,68,.48),rgba(16,22,24,.74) 72%,rgba(7,11,13,.82)) !important;
+}
+html.theme-dark:has(.workspace) body .launcher-world .ws-card.selected .ws-card-title{
+  color:#f6f8f7 !important;
+  text-shadow:0 1px 0 rgba(0,0,0,.65),0 0 12px rgba(201,231,238,.08);
+}
+html.theme-dark:has(.workspace) body .launcher-world .ws-card-selection-hint{
+  width:max-content;
+  max-width:100%;
+  min-height:22px;
+  padding:3px 8px;
+  border:1px solid rgba(207,235,241,.24);
+  border-radius:var(--radius-full);
+  color:#e4f1f3;
+  background:linear-gradient(180deg,rgba(217,239,244,.13),rgba(129,174,185,.07)) !important;
+  box-shadow:inset 0 1px 0 var(--white-a13),0 4px 12px var(--black-a18);
+}
+html.theme-dark:has(.workspace) body .ws-project-row.active{
+  background:radial-gradient(ellipse 95% 110% at 0% 0%,rgba(219,241,245,.13),transparent 63%),
+        linear-gradient(145deg,rgba(117,139,144,.13),var(--white-a4)) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.15),
+        inset 2px 0 0 rgba(211,238,243,.54),
+        0 8px 18px var(--black-a16);
+}
+html.theme-dark:has(.workspace) body .ws-project-row.drag-over{
+  background:var(--home-shortcut-mother-control) !important;
+  outline:2px solid var(--accent) !important;
+  outline-offset:-2px !important;
+  border-color:var(--white-a14) !important;
+}
+html.theme-dark:has(.workspace) body .ws-new-canvas-card{
+  transition:transform .19s cubic-bezier(.22,.8,.28,1),border-color .18s ease,box-shadow .20s ease !important;
+}
+html.theme-dark:has(.workspace) body .ws-new-canvas-card:active{
+  transform:translateY(0) scale(.992) !important;
+  transition-duration:.07s !important;
+}
+html.theme-dark:has(.workspace) body .ws-new-canvas-create{
+  border-color:rgba(229,242,245,.16) !important;
+}
+@keyframes homepage-card-select-confirm{
+  0%{filter:brightness(1);}
+  46%{filter:brightness(1.10);}
+  100%{filter:brightness(1);}
+}
+@media (prefers-reduced-motion:reduce){
+  html.theme-dark:has(.workspace) body .launcher-world .ws-card,
+    html.theme-dark:has(.workspace) body .launcher-world .ws-card::before,
+    html.theme-dark:has(.workspace) body .launcher-world .ws-card::after,
+    html.theme-dark:has(.workspace) body .launcher-world .ws-card-cover-image,
+    html.theme-dark:has(.workspace) body .ws-new-canvas-card{
+    animation:none !important;
+    transition:none !important;
+  }
+}
+@keyframes homepage-return-glass-sweep{
+  from{transform:translateX(-38%);}
+  to{transform:translateX(38%);}
+}
+html.theme-dark:has(.workspace) body .ws-main{
+  isolation:isolate;
+  background-color:var(--av-space-00) !important;
+  background-size:160px 160px,160px 160px,40px 40px,40px 40px,auto,auto,auto !important;
+  background-image:linear-gradient(rgba(255,255,255,.034) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(255,255,255,.034) 1px,transparent 1px),
+        linear-gradient(rgba(255,255,255,.012) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(255,255,255,.012) 1px,transparent 1px),
+        radial-gradient(ellipse 72% 58% at 50% 44%,rgba(255,255,255,.022),transparent 70%),
+        radial-gradient(ellipse 56% 46% at 78% 16%,rgba(255,255,255,.011),transparent 74%),
+        linear-gradient(138deg,#070809 0%,#0a0b0d 46%,#0f1012 74%,#070809 100%) !important;
+}
+html.theme-dark:has(.workspace) body .ws-main::before{
+  content:"";
+  position:absolute;
+  z-index:0;
+  inset:-3%;
+  pointer-events:none;
+  background:linear-gradient(118deg,transparent 18%,var(--white-a3) 37%,transparent 56%),
+        linear-gradient(302deg,transparent 24%,rgba(255,255,255,.017) 50%,transparent 75%),
+        radial-gradient(ellipse 68% 44% at 50% 42%,rgba(255,255,255,.022),transparent 74%);
+}
+html.theme-dark:has(.workspace) body .ws-main > *{position:relative;z-index:1;}
+/* Launcher cards keep this local spotlight material. Top-level buttons and the
+   sidebar project rows were removed from the list: they are Tier A and take the
+   shared mother material, so keeping them here produced two competing sweep
+   systems on one component. */
+html.theme-dark:has(.workspace) body .launcher-world .ws-card{
+  position:relative;
+  isolation:isolate;
+  overflow:hidden;
+  color:var(--av-text);
+  background-color:var(--av-glass-control-deep);
+  background-image:radial-gradient(circle 124px at var(--av-glass-x) var(--av-glass-y),var(--white-a22) 0%,rgba(255,255,255,.075) 22%,var(--white-a2) 43%,transparent 70%),
+        linear-gradient(180deg,var(--white-a13) 0,rgba(255,255,255,.028) 1px,transparent 40%),
+        linear-gradient(142deg,var(--white-a6),rgba(255,255,255,.012) 46%,rgba(0,0,0,.045)),
+        linear-gradient(145deg,var(--av-glass-control),var(--av-glass-control-deep));
+  background-size:auto,100% 100%,100% 100%,100% 100%;
+  background-position:0 0,0 0,0 0,0 0;
+  background-repeat:no-repeat;
+  box-shadow:var(--av-control-shadow);
+  text-shadow:0 1px 2px var(--black-a38);
+  transition:transform .16s var(--av-ease),border-color .16s ease,color .16s ease,box-shadow .18s ease,filter .16s ease,background-color .18s ease !important;
+}
+
+html.theme-dark:has(.workspace) body .launcher-world .ws-card > *{position:relative;z-index:1;}
+html.theme-dark:has(.workspace) body .launcher-world .ws-card:hover{
+  color:#fafaf8 !important;
+  transform:translateY(-1px) !important;
+  border-color:var(--av-glass-line-hover) !important;
+  background-color:rgba(20,21,23,.22) !important;
+  background-image:radial-gradient(circle 148px at var(--av-glass-x) var(--av-glass-y),rgba(255,255,255,.31) 0%,rgba(255,255,255,.105) 22%,var(--white-a3) 45%,transparent 72%),
+        linear-gradient(180deg,rgba(255,255,255,.18) 0,rgba(255,255,255,.04) 1px,transparent 42%),
+        linear-gradient(142deg,rgba(255,255,255,.075),var(--white-a2) 48%,rgba(0,0,0,.055)),
+        linear-gradient(145deg,var(--white-a6),rgba(10,11,13,.18)) !important;
+  box-shadow:var(--av-control-shadow-hover) !important;
+}
+html.theme-dark:has(.workspace) body .launcher-world .ws-card:hover::before{
+  opacity:.72 !important;
+  animation:homepage-return-glass-sweep .8s cubic-bezier(.16,1,.3,1) both !important;
+}
+html.theme-dark:has(.workspace) body .launcher-world .ws-card:active{
+  transform:translateY(.75px) scale(.988) !important;
+  border-color:var(--white-a22) !important;
+  box-shadow:inset 0 4px 10px rgba(0,0,0,.42),inset 0 -1px 0 rgba(255,255,255,.075),0 2px 5px rgba(0,0,0,.20) !important;
+}
+html.theme-dark:has(.workspace) body .launcher-world .ws-card:focus-visible{
+  outline:2px solid rgba(255,255,255,.82) !important;
+  outline-offset:2px !important;
+  border-color:rgba(255,255,255,.44) !important;
+  box-shadow:0 0 0 4px var(--white-a7),0 0 18px var(--white-a6),var(--av-control-shadow-hover) !important;
+}
+html.theme-dark:has(.workspace) body .launcher-world .ws-card.selected{
+  color:#fafaf8 !important;
+  border-color:var(--av-glass-line-hover) !important;
+  background-color:rgba(20,21,23,.22) !important;
+}
+html.theme-dark:has(.workspace) body :is(.ws-project-row,.launcher-world .ws-card) :is(span,strong,p){
+  color:inherit;
+}
+html.theme-dark:has(.workspace) body :is(.ws-project-row,.launcher-world .ws-card) :is(svg,i){
+  color:currentColor;
+  filter:none !important;
+}
+html.theme-dark:has(.workspace) body :is(.ws-project-row,.launcher-world .ws-card):hover :is(svg,i){
+  color:var(--white);
+  filter:drop-shadow(0 0 6px var(--white-a22)) !important;
+}
+/* `.ws-new-canvas-create` is Tier A and already opts out of the pointer
+   spotlight via data-av-pointer="off", so its former override is gone. */
+
+html.theme-dark:has(.workspace) body .ws-new-canvas-icon{
+  color:rgba(241,241,239,.88);
+  background:var(--white-a4);
+  border-color:rgba(255,255,255,.115) !important;
+  box-shadow:inset 0 1px 0 var(--white-a12);
+}
+html.theme-dark:has(.workspace) body .launcher-world .ws-card .ws-card-body{
+  background:transparent !important;
+}
+html.theme-dark:has(.workspace) body .launcher-world .ws-card.dragging,
+html.theme-dark:has(.workspace) body .launcher-world .ws-card.dragging:hover,
+html.theme-dark:has(.workspace) body .launcher-world .ws-card.dragging:active{
+  transform:none !important;
+  transition:none !important;
+}
+@media (prefers-reduced-motion:reduce){
+  html.theme-dark:has(.workspace) body .ws-main::before{animation:none !important;}
+  html.theme-dark:has(.workspace) body :is(.ws-side-settings,.ws-side-add,.ws-project-row,.ws-trash-entry,.launcher-world .ws-card,.ws-new-canvas-create)::before{animation:none !important;}
+}
+html.theme-dark:has(.workspace) body .launcher-world .ws-card::before{
+  content:"" !important;
+  display:block !important;
+  position:absolute !important;
+  inset:0 !important;
+  z-index:5 !important;
+  pointer-events:none !important;
+  border:1px solid rgba(255,255,255,.075) !important;
+  border-radius:inherit !important;
+  background:linear-gradient(180deg,var(--white-a12),transparent 2px),
+        linear-gradient(90deg,rgba(222,239,242,.045),transparent 14%,transparent 86%,var(--white-a3)) !important;
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.12) !important;
+  opacity:.86 !important;
+  transform:none !important;
+  animation:none !important;
+  transition:opacity .18s ease,border-color .18s ease,box-shadow .20s ease !important;
+}
+@keyframes homepage-card-single-sweep{
+  0%{opacity:0;transform:translate3d(-165%,0,0) skewX(-14deg);}
+  18%{opacity:.28;}
+  58%{opacity:.58;}
+  100%{opacity:0;transform:translate3d(315%,0,0) skewX(-14deg);}
+}
+html.theme-dark:has(.workspace) body .launcher-world .ws-card::after{
+  content:"" !important;
+  position:absolute !important;
+  inset:-28% auto -28% -44% !important;
+  width:52% !important;
+  z-index:4 !important;
+  pointer-events:none !important;
+  border-radius:34% !important;
+  background:linear-gradient(105deg,transparent 6%,rgba(222,240,244,.055) 25%,rgba(255,255,255,.32) 49%,rgba(218,238,242,.075) 72%,transparent 94%) !important;
+  filter:blur(5px) !important;
+  opacity:0;
+  transform:translate3d(-165%,0,0) skewX(-14deg);
+  transition:none !important;
+  animation:none !important;
+  will-change:transform,opacity;
+}
+html.theme-dark:has(.workspace) body .launcher-world .ws-card:hover:not(.dragging)::after{
+  animation:homepage-card-single-sweep .92s cubic-bezier(.2,.72,.24,1) 1 both !important;
+}
+html.theme-dark:has(.workspace) body .launcher-world .ws-card.selected:not(:hover)::after,
+html.theme-dark:has(.workspace) body .launcher-world .ws-card.dragging::after{
+  opacity:0 !important;
+  animation:none !important;
+}
+/* Preserve the existing sidebar and compact create/import hover strength. */
+html.theme-dark:has(.workspace) body :is(.ws-project-row,.ws-trash-entry):hover::before{opacity:.56 !important;}
+html.theme-dark:has(.workspace) body :is(.ws-new-canvas-create):hover::before{opacity:.48 !important;}
+/* The sweep shares ::after with card reordering, so explicit drop markers retain priority. */
+html.theme-dark:has(.workspace) body .launcher-world .ws-card.drop-before::after,
+html.theme-dark:has(.workspace) body .launcher-world .ws-card.drop-after::after{
+  inset:auto 12px auto 12px !important;
+  width:auto !important;
+  height:3px !important;
+  border-radius:var(--radius-full) !important;
+  background:#22d3ee !important;
+  box-shadow:0 0 0 2px rgba(34,211,238,.18),0 0 14px rgba(34,211,238,.7) !important;
+  filter:none !important;
+  opacity:1 !important;
+  transform:none !important;
+  animation:none !important;
+}
+html.theme-dark:has(.workspace) body .launcher-world .ws-card.drop-before::after{top:-10px !important;bottom:auto !important;}
+html.theme-dark:has(.workspace) body .launcher-world .ws-card.drop-after::after{top:auto !important;bottom:-10px !important;}
+
+
+@media (prefers-reduced-motion:reduce){
+  html.theme-dark:has(.workspace) body .launcher-world .ws-card::after{
+    opacity:0 !important;
+    animation:none !important;
+  }
+  html.theme-dark:has(.workspace) body .launcher-world .ws-card.drop-before::after,
+    html.theme-dark:has(.workspace) body .launcher-world .ws-card.drop-after::after{opacity:1 !important;}
+}
+@media (min-width:761px){
+  .ws-sidebar,
+    html[data-studio-scale="off"].studio-scale-managed .ws-sidebar{
+    flex-basis:256px;
+    width:256px;
+  }
+}
+.ws-home-tools{
+  position:absolute;
+  inset:0 0 auto 0 !important;
+  z-index:8;
+  min-height:68px;
+  padding:12px 24px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:20px;
+  color:var(--text);
+  border-bottom:1px solid rgba(224,237,240,.10);
+  background:linear-gradient(180deg,rgba(12,14,16,.90),rgba(10,12,14,.78));
+  backdrop-filter:blur(16px) saturate(112%);
+  box-shadow:0 10px 28px rgba(0,0,0,.12);
+}
+.ws-home-context{
+  min-width:0;
+  display:flex;
+  align-items:baseline;
+  gap:10px;
+}
+.ws-home-project-name{
+  overflow:hidden;
+  max-width:28vw;
+  color:#eef1ef;
+  font-size:16px;
+  font-weight:760;
+  line-height:1.2;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.ws-home-canvas-count{
+  flex:0 0 auto;
+  color:#8f9794;
+  font-size:12px;
+  font-weight:650;
+}
+.ws-home-actions{
+  min-width:0;
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:8px;
+}
+.ws-home-search,
+.ws-home-sort-wrap{
+  height:38px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  color:#8f9794;
+  border:1px solid rgba(224,237,240,.11);
+  border-radius:var(--radius-10);
+  background:var(--white-a4);
+  box-shadow:inset 0 1px 0 var(--white-a4);
+  transition:border-color .16s ease,background-color .16s ease,box-shadow .16s ease;
+}
+.ws-home-search{width:220px;padding:0 11px;}
+.ws-home-sort-wrap{padding:0 8px 0 11px;}
+.ws-home-search:focus-within,
+.ws-home-sort-wrap:focus-within{
+  color:#dbe2df;
+  border-color:rgba(211,235,240,.34);
+  background:var(--white-a6);
+  box-shadow:0 0 0 3px rgba(195,226,233,.06),inset 0 1px 0 rgba(255,255,255,.06);
+}
+.ws-home-search svg,
+.ws-home-sort-wrap svg{width:15px;height:15px;flex:0 0 auto;}
+.ws-home-search input,
+.ws-home-sort-wrap select{
+  min-width:0;
+  height:100%;
+  color:#dfe4e2;
+  border:0;
+  outline:0;
+  background:transparent;
+  font:650 12px/1 'Inter',-apple-system,sans-serif;
+}
+.ws-home-search input{width:100%;}
+.ws-home-search input::placeholder{color:#777f7c;}
+.ws-home-search input::-webkit-search-cancel-button{opacity:.62;filter:invert(1);}
+.ws-home-sort-wrap select{width:112px;cursor:default;color-scheme:dark;}
+.ws-home-sort-wrap option{background:#15181b;color:#e7ebe9;}
+.ws-home-primary,
+.ws-home-secondary{
+  height:38px;
+  padding:0 13px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  border-radius:var(--radius-10);
+  cursor:default;
+  font:750 12px/1 'Inter',-apple-system,sans-serif;
+  transition:transform .14s ease,border-color .14s ease,background-color .14s ease,box-shadow .16s ease;
+}
+.ws-home-primary{
+  color:#101416;
+  border:1px solid rgba(255,255,255,.58);
+  background:linear-gradient(180deg,#eef4f3,#cfd9d7);
+  box-shadow:0 7px 16px var(--black-a18),inset 0 1px 0 var(--white);
+}
+.ws-home-secondary{
+  color:#d8dddb;
+  border:1px solid rgba(224,237,240,.14);
+  background:rgba(255,255,255,.045);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.05);
+}
+.ws-home-primary:hover,
+.ws-home-secondary:hover{transform:translateY(-1px);}
+.ws-home-primary:hover{background:linear-gradient(180deg,#f7fbfa,#d9e2e0);box-shadow:0 10px 22px rgba(0,0,0,.24),inset 0 1px 0 var(--white);}
+.ws-home-secondary:hover{color:#f0f3f2;border-color:rgba(224,237,240,.26);background:rgba(255,255,255,.075);}
+.ws-home-primary:active,
+.ws-home-secondary:active{transform:translateY(0) scale(.98);}
+.ws-home-primary:focus-visible,
+.ws-home-secondary:focus-visible,
+.ws-home-search:has(input:focus-visible),
+.ws-home-sort-wrap:has(select:focus-visible){outline:2px solid rgba(201,232,238,.72);outline-offset:2px;}
+.ws-home-primary svg,
+.ws-home-secondary svg{width:15px;height:15px;}
+.ws-home-actions .ws-paste-btn{height:38px;border-radius:var(--radius-10);box-shadow:none;}
+.launcher-world{
+  padding:40px 24px 64px !important;
+  grid-template-columns:repeat(auto-fill,minmax(244px,1fr));
+  gap:18px !important;
+}
+.launcher-world .ws-card,
+.ws-new-canvas-card,
+.launcher-world .launcher-create-card{height:232px;}
+.launcher-world.is-filtered-or-sorted .ws-card{cursor:default;}
+html.theme-dark:has(.workspace) body .ws-main::before{
+  opacity:.18 !important;
+  animation:none !important;
+}
+html.theme-dark:has(.workspace) body .launcher-world .ws-card{
+  border-color:rgba(220,235,238,.14) !important;
+}
+html.theme-dark:has(.workspace) body .launcher-world .ws-card:hover:not(.dragging),
+html.theme-dark:has(.workspace) body .launcher-world .ws-card:focus-within:not(.dragging){
+  border-color:rgba(224,239,242,.26) !important;
+  box-shadow:0 19px 40px rgba(0,0,0,.36),inset 0 1px 0 var(--white-a13) !important;
+}
+html.theme-dark:has(.workspace) body .launcher-world .ws-card-title{
+  font-size:14px;
+  font-weight:720;
+}
+html.theme-dark:has(.workspace) body .launcher-world .ws-card-meta{
+  margin-top:5px;
+  font-size:11px;
+}
+html.theme-dark:has(.workspace) body .launcher-world .ws-card-menu{
+  width:26px;
+  height:26px;
+  opacity:.30;
+  color:#c7cecb;
+  border-color:transparent !important;
+  background:rgba(8,10,12,.20) !important;
+  box-shadow:none;
+}
+html.theme-dark:has(.workspace) body .launcher-world .ws-card:hover .ws-card-menu,
+html.theme-dark:has(.workspace) body .launcher-world .ws-card:focus-within .ws-card-menu,
+html.theme-dark:has(.workspace) body .launcher-world .ws-card.selected .ws-card-menu{opacity:.82 !important;}
+html.theme-dark:has(.workspace) body .launcher-world .ws-card .ws-card-menu:hover{
+  opacity:1 !important;
+  color:#f4f7f5 !important;
+  border-color:rgba(224,237,240,.18) !important;
+  background:rgba(18,22,24,.72) !important;
+}
+html.theme-dark:has(.workspace) body .ws-new-canvas-card{
+  padding:0 !important;
+  border-color:rgba(220,235,238,.14) !important;
+}
+html.theme-dark:has(.workspace) body .ws-new-canvas-card:hover,
+html.theme-dark:has(.workspace) body .ws-new-canvas-card:focus-within{
+  transform:translateY(-2px) !important;
+  border-color:rgba(224,239,242,.28) !important;
+  background:rgba(255,255,255,.028) !important;
+}
+html.theme-dark:has(.workspace) body .ws-new-canvas-create{
+  width:100%;
+  height:100%;
+  padding:24px;
+  border:0 !important;
+  border-radius:14px !important;
+  background:transparent !important;
+  box-shadow:none;
+}
+/* New canvas cards: no mouse-following spotlight. */
+html.theme-dark:has(.workspace) body :is(.ws-new-canvas-create){
+  background-image:linear-gradient(180deg,var(--white-a13) 0,rgba(255,255,255,.028) 1px,transparent 40%),linear-gradient(142deg,var(--white-a6),rgba(255,255,255,.012) 46%,rgba(0,0,0,.045)),linear-gradient(145deg,var(--av-glass-control),var(--av-glass-control-deep));
+}
+html.theme-dark:has(.workspace) body :is(.ws-new-canvas-create):hover{
+  background-color:var(--av-glass-control-deep) !important;
+  background-image:linear-gradient(180deg,var(--white-a13) 0,rgba(255,255,255,.028) 1px,transparent 40%),linear-gradient(142deg,var(--white-a6),rgba(255,255,255,.012) 46%,rgba(0,0,0,.045)),linear-gradient(145deg,var(--av-glass-control),var(--av-glass-control-deep)) !important;
+}
+
+html.theme-dark:has(.workspace) body .ws-new-canvas-icon{
+  width:42px;
+  height:42px;
+  border-radius:var(--radius-lg);
+  border:1px solid rgba(224,237,240,.14);
+}
+html.theme-dark:has(.workspace) body .ws-new-canvas-sub{margin-top:6px;font-size:11px;}
+.ws-home-search-empty{
+  min-height:232px;
+  grid-column:1 / -1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  color:#7f8884;
+  border:1px dashed rgba(220,235,238,.13);
+  border-radius:14px;
+  background:rgba(255,255,255,.012);
+}
+.ws-home-search-empty svg{width:25px;height:25px;margin-bottom:4px;opacity:.65;}
+.ws-home-search-empty strong{color:#cfd5d2;font-size:13px;font-weight:700;}
+.ws-home-search-empty span{font-size:11px;}
+@media (max-width:1050px){
+  .ws-home-tools{align-items:flex-start;min-height:112px;padding:12px 18px;}
+  .ws-home-context{padding-top:10px;}
+  .ws-home-actions{flex-wrap:wrap;}
+  .ws-home-search{order:3;width:min(100%,280px);}
+  .launcher-world{padding:120px 18px 52px !important;grid-template-columns:repeat(auto-fill,minmax(224px,1fr));gap:14px !important;}
+}
+@media (max-width:760px){
+  .ws-home-tools{min-height:104px;padding:10px 14px;gap:10px;}
+  .ws-home-project-name{max-width:32vw;font-size:14px;}
+  .ws-home-canvas-count{display:none;}
+  .ws-home-actions{gap:6px;}
+  .ws-home-search{width:170px;}
+  .ws-home-sort-wrap select{width:94px;}
+  .ws-home-primary,
+    .ws-home-secondary{width:36px;padding:0;}
+  .ws-home-primary span,
+    .ws-home-secondary span{display:none;}
+  .launcher-world{padding:112px 14px 48px !important;}
+}
+@media (max-width:560px){
+  .ws-home-tools{min-height:146px;flex-direction:column;align-items:stretch;}
+  .ws-home-context{padding-top:2px;}
+  .ws-home-project-name{max-width:70vw;}
+  .ws-home-actions{justify-content:flex-start;}
+  .ws-home-search{order:0;width:100%;flex:1 0 100%;}
+  .ws-home-sort-wrap{flex:1 1 auto;}
+  .ws-home-sort-wrap select{width:100%;}
+  .launcher-world{padding:154px 12px 42px !important;grid-template-columns:1fr;}
+}
+/* Duplicate homepage mother-material variable block removed 20260808: identical values are
+   declared in SHORTCUT_MOTHER_GLASS_STRICT_HOMEPAGE_20260804 below and every consumer rule is
+   body-scoped, so the html-level copy was dead weight. */
+/* A-block duplicate homepage glass mappings removed 20260808; authoritative source is
+   SHORTCUT_MOTHER_GLASS_STRICT_HOMEPAGE_20260804 below. Only the variable declarations
+   above and the .api-settings-modal structure below remain here. */
+/* API 设置改为首页内居中卡片；内容页由 iframe 嵌入，保留原有 API 交互。 */
+.api-settings-modal{position:absolute;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;padding:32px;background:rgba(3,6,9,.64);-webkit-backdrop-filter:blur(10px) saturate(.78);backdrop-filter:blur(10px) saturate(.78);opacity:0;visibility:hidden;pointer-events:none;transition:opacity .14s ease,visibility .14s ease;}
+.api-settings-modal[hidden]{display:none;}
+.api-settings-modal.open{opacity:1;visibility:visible;pointer-events:auto;}
+.api-settings-modal-card{width:min(1440px,calc(100vw - 64px));height:min(88vh,calc(100vh - 64px));min-width:0;min-height:0;display:flex;flex-direction:column;overflow:hidden;border:1px solid rgba(205,223,230,.16);border-radius:18px;background:linear-gradient(145deg,rgba(34,42,48,.96),rgba(13,17,21,.985));box-shadow:0 26px 72px rgba(0,0,0,.58),inset 0 1px 0 var(--white-a12),inset 0 -1px 0 var(--black-a34);}
+.api-settings-modal-head{height:56px;min-height:56px;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:0 16px 0 20px;border-bottom:1px solid rgba(205,223,230,.12);background:linear-gradient(180deg,rgba(255,255,255,.065),rgba(255,255,255,.016));box-shadow:inset 0 1px 0 var(--white-a7);}
+.api-settings-modal-title{display:inline-flex;align-items:center;gap:8px;min-width:0;color:rgba(243,249,250,.95);font-size:14px;font-weight:850;letter-spacing:.02em;}
+.api-settings-modal-title svg{width:17px;height:17px;color:rgba(193,229,239,.88);stroke-width:2;}
+.api-settings-modal-actions{display:flex;align-items:center;gap:10px;min-width:0;}
+.api-settings-modal-status{min-width:0;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:rgba(186,220,231,.78);font-size:11px;font-weight:750;}
+.api-settings-modal-close{width:30px;height:30px;display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;border:1px solid rgba(214,229,235,.16);border-radius:var(--radius-9);background:radial-gradient(ellipse 90% 72% at 18% 0%,var(--white-a10),transparent 68%),linear-gradient(145deg,rgba(46,54,60,.78),rgba(17,21,25,.90));color:rgba(225,236,240,.82);box-shadow:0 4px 9px var(--black-a22),inset 0 1px 0 var(--white-a12),inset 0 -1px 0 rgba(0,0,0,.28);transition:transform .12s ease,box-shadow .12s ease,border-color .12s ease,color .12s ease;}
+.api-settings-modal-close:hover,.api-settings-modal-close:focus-visible{outline:0;transform:translateY(-1px);border-color:rgba(189,229,242,.32);color:#f8fcfd;box-shadow:0 7px 14px rgba(0,0,0,.28),0 0 12px rgba(121,203,232,.08),inset 0 1px 0 rgba(255,255,255,.19);}
+.api-settings-modal-close:focus-visible{outline:2px solid rgba(199,235,247,.62);outline-offset:2px;}
+.api-settings-modal-close svg{width:16px;height:16px;stroke-width:2;}
+.api-settings-modal-frame{display:block;flex:1 1 auto;width:100%;min-width:0;min-height:0;border:0;background:transparent;}
+@media (max-width:760px){
+  .api-settings-modal{padding:12px;}
+  .api-settings-modal-card{width:100%;height:calc(100vh - 24px);border-radius:14px;}
+  .api-settings-modal-head{height:52px;min-height:52px;padding:0 12px 0 15px;}
+  .api-settings-modal-status{display:none;}
+}
+/* SHORTCUT_MOTHER_GLASS_STRICT_HOMEPAGE_20260804
+   The shortcut card is the only material source. These names are kept for the
+   existing call sites below, but they now alias the shared tokens in
+   button-glass.css instead of holding their own copies of the values. */
+html.theme-dark:has(.workspace) body{
+    --home-shortcut-mother-edge:var(--av-mother-edge);
+    --home-shortcut-mother-surface:var(--av-mother-surface);
+    --home-shortcut-mother-shadow:var(--av-mother-shadow);
+    --home-shortcut-mother-control:var(--av-mother-control);
+    --home-shortcut-mother-control-hover:var(--av-mother-control-hover);
+}
+html.theme-dark:has(.workspace) body,
+html.theme-dark:has(.workspace) body .workspace{
+    background:
+        radial-gradient(ellipse 66% 54% at 74% -14%,rgba(171,221,202,.035),transparent 70%),
+        linear-gradient(145deg,#101415,#090c0d 65%,#070909)!important;
+}
+/* Sidebar and fixed toolbar use the shortcut modal's full base glass. */
+html.theme-dark:has(.workspace) body .ws-sidebar,
+html.theme-dark:has(.workspace) body .ws-home-tools,
+html.theme-dark:has(.workspace) body .ws-trash-panel{
+    border:0!important;
+    outline:1px solid var(--home-shortcut-mother-edge)!important;
+    outline-offset:-1px;
+    background:var(--home-shortcut-mother-surface)!important;
+    box-shadow:var(--home-shortcut-mother-shadow)!important;
+    -webkit-backdrop-filter:var(--av-mother-panel-filter)!important;
+    backdrop-filter:var(--av-mother-panel-filter)!important;
+}
+html.theme-dark:has(.workspace) body .ws-sidebar{border-right-color:var(--home-shortcut-mother-edge)!important;}
+html.theme-dark:has(.workspace) body .ws-home-tools{
+    border-radius:0 0 16px 16px!important;
+    border-top:0!important;
+}
+html.theme-dark:has(.workspace) body .ws-trash-panel{border-radius:18px!important;}
+
+/* Card shell inherits the same dense bottom glass; cover stays unfiltered. */
+html.theme-dark:has(.workspace) body .launcher-world .ws-card,
+html.theme-dark:has(.workspace) body .ws-new-canvas-card,
+html.theme-dark:has(.workspace) body .ws-home-search-empty{
+    border:0!important;
+    outline:1px solid var(--home-shortcut-mother-edge)!important;
+    outline-offset:-1px;
+    background:var(--home-shortcut-mother-surface)!important;
+    box-shadow:var(--home-shortcut-mother-shadow)!important;
+    -webkit-backdrop-filter:var(--av-mother-panel-filter)!important;
+    backdrop-filter:var(--av-mother-panel-filter)!important;
+}
+html.theme-dark:has(.workspace) body .launcher-world .ws-card:hover,
+html.theme-dark:has(.workspace) body .launcher-world .ws-card:focus-within,
+html.theme-dark:has(.workspace) body .launcher-world .ws-card.selected,
+html.theme-dark:has(.workspace) body .ws-new-canvas-card:hover,
+html.theme-dark:has(.workspace) body .ws-new-canvas-card:focus-within{
+    outline-color:var(--white-a14)!important;
+    box-shadow:
+        0 40px 96px rgba(0,0,0,.66),
+        0 16px 42px rgba(0,0,0,.40),
+        inset 0 1px 0 rgba(255,255,255,.20),
+        inset 1px 0 0 rgba(239,250,246,.052),
+        inset -1px 0 0 rgba(202,231,221,.085),
+        inset 0 -2px 0 rgba(223,242,233,.17)!important;
+}
+/* Keep the card shell visibly frosted while hovering; hover should only lift/highlight it. */
+html.theme-dark:has(.workspace) body .launcher-world .ws-card:hover:not(.selected),
+html.theme-dark:has(.workspace) body .launcher-world .ws-card:focus-within:not(.selected){
+    background:var(--home-shortcut-mother-surface)!important;
+    -webkit-backdrop-filter:var(--av-mother-panel-filter)!important;
+    backdrop-filter:var(--av-mother-panel-filter)!important;
+}html.theme-dark:has(.workspace) body .launcher-world .ws-card-cover{
+    border-bottom-color:rgba(255,255,255,.032);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.05);
+}
+html.theme-dark:has(.workspace) body .launcher-world .ws-card-title{color:rgba(244,249,246,.92);}
+html.theme-dark:has(.workspace) body .launcher-world .ws-card-meta,
+html.theme-dark:has(.workspace) body .ws-new-canvas-sub{color:rgba(207,218,212,.56);}
+
+/* Ordinary home buttons take the approved Composer material so they read as
+   the same component family as the Tier A buttons beside them. Tier A buttons
+   and links are owned by button-glass.css and are deliberately not listed here.
+   `.ws-project-row` is the one exception: canvas-list.js marks it Tier A but
+   builds it as a div, and the shared Tier A selector only matches button/a, so
+   the row would otherwise never receive the mother material. */
+html.theme-dark:has(.workspace) body :is(
+    .ws-mini-btn,.ws-icon-btn,.launcher-world .ws-card-menu
+):not(.drag-over){
+    border:0!important;
+    border-radius:var(--radius-md)!important;
+    outline:1px solid var(--av-mother-edge)!important;
+    outline-offset:-1px;
+    background:var(--av-mother-surface-compact)!important;
+    background-size:auto;
+    box-shadow:var(--av-mother-nested-shadow)!important;
+    -webkit-backdrop-filter:var(--av-mother-control-filter)!important;
+    backdrop-filter:var(--av-mother-control-filter)!important;
+    color:var(--av-mother-text)!important;
+}
+html.theme-dark:has(.workspace) body :is(
+    .ws-mini-btn,.ws-icon-btn,.launcher-world .ws-card-menu
+):not(.drag-over):is(:hover,:focus-visible,.active){
+    outline-color:var(--color-f5fcf9-a11)!important;
+    background:var(--av-mother-surface-compact-hover)!important;
+    box-shadow:var(--av-mother-nested-shadow-hover)!important;
+    color:var(--av-mother-text-strong)!important;
+}
+/* Fields and non-button surfaces stay on the thinner control layer: they sit
+   inside the panel and must not compete with the buttons for depth. */
+html.theme-dark:has(.workspace) body :is(
+    .ws-home-search,.ws-home-sort-wrap,.ws-new-canvas-icon
+){
+    border-color:var(--white-a9)!important;
+    border-radius:var(--radius-md)!important;
+    background:var(--home-shortcut-mother-control)!important;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.095),inset 0 -1px 0 rgba(0,0,0,.17),0 2px 7px var(--black-a10)!important;
+    -webkit-backdrop-filter:var(--av-mother-control-filter)!important;
+    backdrop-filter:var(--av-mother-control-filter)!important;
+    color:rgba(238,244,240,.82)!important;
+}
+html.theme-dark:has(.workspace) body :is(.ws-home-search input,.ws-home-sort-wrap select,.ws-newproj-input){
+    color:rgba(244,249,246,.92);
+    background:transparent!important;
+}
+html.theme-dark:has(.workspace) body :is(
+    .ws-home-search,.ws-home-sort-wrap,.ws-new-canvas-icon
+):hover,
+html.theme-dark:has(.workspace) body :is(
+    .ws-home-search,.ws-home-sort-wrap,.ws-new-canvas-icon
+):focus-within{
+    border-color:var(--white-a14)!important;
+    background:var(--home-shortcut-mother-control-hover)!important;
+    color:rgba(249,252,250,.96)!important;
+}
+/* The bright painted "primary" pill is gone: primary now reads as the same
+   mother glass with stronger copy, so it no longer breaks the material.
+   `.ws-home-primary` is Tier A and takes its surface from button-glass.css. */
+html.theme-dark:has(.workspace) body .ws-mini-btn.primary{
+    border-color:var(--white-a14);
+    background:var(--home-shortcut-mother-control-hover)!important;
+    color:var(--av-mother-text-strong)!important;
+    box-shadow:var(--av-mother-control-hover-shadow)!important;
+}
+/* Preserve the custom sort menu structure, hidden state and portal-like stacking. */
+html.theme-dark:has(.workspace) body .ws-home-actions,
+html.theme-dark:has(.workspace) body .ws-home-sort-wrap{overflow:visible!important;}
+html.theme-dark:has(.workspace) body .ws-home-sort-wrap{position:relative;display:flex;align-items:center;gap:6px!important;padding:0 7px 0 9px!important;isolation:isolate;}
+html.theme-dark:has(.workspace) body .ws-home-sort-wrap > svg{flex:0 0 auto;color:rgba(206,215,210,.58);}
+html.theme-dark:has(.workspace) body #canvasSortSelect[hidden],
+html.theme-dark:has(.workspace) body .ws-home-sort-menu[hidden]{display:none;}
+html.theme-dark:has(.workspace) body .ws-home-sort-button{
+  height:34px;
+  min-width:112px;
+  padding:0 2px!important;
+  border:0!important;
+  display:inline-flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px!important;
+  background:transparent!important;
+  background-image:none;
+  color:rgba(238,244,240,.82);
+  font-size:11px;
+  font-weight:760;
+  box-shadow:none;
+  outline:0!important;
+}
+html.theme-dark:has(.workspace) body .ws-home-sort-button .ws-home-sort-chevron{width:13px;height:13px;color:rgba(206,215,210,.58);transition:transform .14s ease!important;}
+html.theme-dark:has(.workspace) body .ws-home-sort-button.open .ws-home-sort-chevron{transform:rotate(180deg)!important;}
+html.theme-dark:has(.workspace) body .ws-home-sort-menu{position:absolute;z-index:80;top:calc(100% + 8px);right:0;width:188px;padding:7px!important;border:0!important;outline:1px solid var(--home-shortcut-mother-edge)!important;outline-offset:-1px;background:var(--home-shortcut-mother-surface)!important;box-shadow:var(--home-shortcut-mother-shadow)!important;-webkit-backdrop-filter:var(--av-mother-panel-filter)!important;backdrop-filter:var(--av-mother-panel-filter)!important;border-radius:14px!important;}
+html.theme-dark:has(.workspace) body .ws-home-sort-menu-title{padding:5px 8px 7px;color:rgba(206,215,210,.58);font-size:9.5px;font-weight:800;letter-spacing:.06em;}
+html.theme-dark:has(.workspace) body .ws-home-sort-option{min-height:34px;padding:0 9px!important;display:flex;align-items:center;justify-content:space-between;gap:10px!important;font-size:11px;font-weight:740;cursor:default;}
+html.theme-dark:has(.workspace) body .ws-home-sort-option svg{width:13px;height:13px;opacity:0;color:rgba(238,244,240,.95);}
+html.theme-dark:has(.workspace) body .ws-home-sort-option.active svg{opacity:1;}
+html.theme-dark:has(.workspace) body :is(.ws-home-sort-option,.ws-pop-item):hover{background:var(--home-shortcut-mother-control)!important;}
+/* Homepage API-settings host keeps layout/iframe behavior and receives the same panel/tool/keycap hierarchy. */
+html.theme-dark:has(.workspace) body .api-settings-modal{background:rgba(3,7,8,.62);-webkit-backdrop-filter: var(--av-mother-control-light-filter)!important;backdrop-filter: var(--av-mother-control-light-filter)!important;}
+html.theme-dark:has(.workspace) body .api-settings-modal-head{
+  border-bottom:1px solid rgba(255,255,255,.032)!important;
+  background:radial-gradient(ellipse 65% 145% at 9% -56%,rgba(255,255,255,.065),transparent 67%),linear-gradient(180deg,rgba(255,255,255,.026),transparent 80%)!important;
+  box-shadow:0 1px 0 rgba(0,0,0,.14);
+}
+html.theme-dark:has(.workspace) body .api-settings-modal-card{border-radius:22px!important;border:0!important;outline:1px solid var(--home-shortcut-mother-edge)!important;outline-offset:-1px;background:var(--home-shortcut-mother-surface)!important;box-shadow:var(--home-shortcut-mother-shadow)!important;-webkit-backdrop-filter:var(--av-mother-panel-filter)!important;backdrop-filter:var(--av-mother-panel-filter)!important;}
+html.theme-dark:has(.workspace) body .api-settings-modal-close{
+  border:1px solid rgba(255,255,255,.11)!important;
+  border-radius:var(--radius-10)!important;
+  background:var(--home-shortcut-mother-control)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.095),inset 0 -1px 0 rgba(0,0,0,.17),0 2px 7px var(--black-a10);
+  -webkit-backdrop-filter:var(--av-mother-control-filter)!important;
+  backdrop-filter:var(--av-mother-control-filter)!important;
+  color:rgba(238,244,240,.82);
+}
+html.theme-dark:has(.workspace) body .api-settings-modal-close:is(:hover,:focus-visible){border-color:rgba(255,255,255,.18)!important;background:var(--home-shortcut-mother-control-hover)!important;color:rgba(249,252,250,.96)!important;}
+/* Keep the verified toolbar stacking/pointer repair as the final source of truth. */
+html.theme-dark:has(.workspace) body .ws-main > .ws-home-tools{z-index:8;pointer-events:auto;}
+html.theme-dark:has(.workspace) body .ws-main > .launcher-board{z-index:1;}
+@media (max-width:760px){
+  html.theme-dark:has(.workspace) body .ws-home-sort-button{min-width:78px;}
+  html.theme-dark:has(.workspace) body .ws-home-sort-menu{right:-7px;width:174px;}
+}
+@media (prefers-reduced-motion:reduce){
+  html.theme-dark:has(.workspace) body :is(.ws-home-sort-button .ws-home-sort-chevron,.ws-home-primary,.ws-mini-btn,.ws-icon-btn,.ws-card-menu){transition:none!important;animation:none!important;}
+}
+
+
+
+/* Launcher card controls: whole-card drag keeps an explicit rename affordance. */
+.launcher-world .ws-card-title-row{display:flex;align-items:flex-start;gap:6px;min-width:0;}
+.launcher-world .ws-card-title-row .ws-card-title{flex:1 1 auto;min-width:0;}
+.launcher-world .ws-card-rename{width:26px;height:26px;flex:0 0 26px;display:inline-flex;align-items:center;justify-content:center;margin:-2px -3px 0 0;padding:0;border:1px solid transparent;border-radius:var(--radius-7);background:transparent;color:var(--faint);cursor:default;opacity:.62;transition:opacity .14s var(--ease),background .14s var(--ease),border-color .14s var(--ease),color .14s var(--ease);}
+.launcher-world .ws-card:hover .ws-card-rename,.launcher-world .ws-card:focus-within .ws-card-rename{opacity:1;}
+.launcher-world .ws-card-rename:hover,.launcher-world .ws-card-rename:focus-visible{color:var(--text);background:var(--soft);border-color:var(--line);outline:0;}
+.ws-card-rename svg{width:13px;height:13px;}
+.ws-home-search[hidden],#canvasSortControl[hidden]{display:none;}
+
+/* While cards are live-reflowing during a manual reorder, drop the expensive glass/sweep layers. */
+html.theme-dark:has(.workspace) body.home-reordering .launcher-world .ws-card,
+html.theme-dark:has(.workspace) body.home-reordering .launcher-world .ws-card:hover,
+html.theme-dark:has(.workspace) body.home-reordering .launcher-world .ws-card:focus-within,
+html.theme-dark:has(.workspace) body.home-reordering .launcher-world .ws-card.selected{
+  transition:none !important;
+  -webkit-backdrop-filter:none !important;
+  backdrop-filter:none !important;
+  will-change:auto !important;
+}
+html.theme-dark:has(.workspace) body.home-reordering .launcher-world .ws-card::before,
+html.theme-dark:has(.workspace) body.home-reordering .launcher-world .ws-card::after{
+  animation:none !important;
+  transition:none !important;
+}
+
+/* CODEx 2026.08.07 homepage remaining shortcut-mother mapping pass.
+   The card cover stays intentionally unfiltered; only floating panels,
+   inline confirm layers, trash cards and their controls are remapped.
+   Canvas cover delete confirm and trash confirm keep neutral controls;
+   project delete keeps its existing red confirm button. */
+html.theme-dark:has(.workspace) body :is(
+  .ws-card-pop,
+  .ws-create-card,
+  .ws-trash-card,
+  .ws-newproj-row,
+  .ws-project-confirm,
+  .ws-card-delete-confirm,
+  .ws-trash-confirm,
+  .ws-status
+){
+  border:0!important;
+  outline:1px solid var(--home-shortcut-mother-edge)!important;
+  outline-offset:-1px;
+  background:var(--home-shortcut-mother-surface)!important;
+  box-shadow:var(--home-shortcut-mother-shadow)!important;
+  color:var(--home-shortcut-mother-text,rgba(238,244,240,.82))!important;
+}
+html.theme-dark:has(.workspace) body :is(.ws-card-pop,.ws-create-card){
+  border-radius:14px!important;
+  -webkit-backdrop-filter:var(--av-mother-panel-filter)!important;
+  backdrop-filter:var(--av-mother-panel-filter)!important;
+}
+html.theme-dark:has(.workspace) body :is(.ws-trash-card,.ws-status){
+  border-radius:14px!important;
+}
+html.theme-dark:has(.workspace) body .ws-newproj-row,
+html.theme-dark:has(.workspace) body .ws-project-confirm,
+html.theme-dark:has(.workspace) body .ws-card-delete-confirm,
+html.theme-dark:has(.workspace) body .ws-trash-confirm{
+  border-radius:var(--radius-lg)!important;
+  background:var(--home-shortcut-mother-tool,rgba(7,12,13,.095))!important;
+  box-shadow:var(--home-shortcut-mother-tool-shadow,inset 0 1px 0 rgba(255,255,255,.11),0 6px 14px var(--black-a10))!important;
+}
+html.theme-dark:has(.workspace) body :is(
+  .ws-card-rename,
+  .ws-trash-act,
+  .ws-confirm-btn,
+  .ws-cancel-btn,
+  .ws-card-delete-actions button,
+  .ws-trash-confirm-actions button,
+  .ws-project-confirm-actions button,
+  .ws-pop-item,
+  .ws-card-title-input
+){
+  border:1px solid var(--white-a9);
+  outline:0!important;
+  border-radius:var(--radius-md)!important;
+  background:var(--home-shortcut-mother-control)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.095),inset 0 -1px 0 rgba(0,0,0,.17),0 2px 7px var(--black-a10);
+  color:var(--home-shortcut-mother-text,rgba(238,244,240,.82))!important;
+}
+html.theme-dark:has(.workspace) body :is(
+  .ws-card-rename,
+  .ws-trash-act,
+  .ws-confirm-btn,
+  .ws-cancel-btn,
+  .ws-card-delete-actions button,
+  .ws-trash-confirm-actions button,
+  .ws-project-confirm-actions button,
+  .ws-pop-item,
+  .ws-card-title-input
+):is(:hover,:focus-visible,.active,[aria-selected="true"]){
+  border-color:var(--white-a14)!important;
+  background:var(--home-shortcut-mother-control-hover)!important;
+  color:rgba(249,252,250,.96)!important;
+  box-shadow:0 6px 14px var(--black-a16),inset 0 1px 0 rgba(255,255,255,.11),inset 0 -1px 0 var(--black-a13)!important;
+}
+html.theme-dark:has(.workspace) body .ws-confirm-btn{
+  color:rgba(255,205,212,.96)!important;
+  border-color:rgba(255,157,169,.24)!important;
+}
+html.theme-dark:has(.workspace) body :is(.ws-card-delete-yes,.ws-trash-confirm-yes){
+  color:var(--home-shortcut-mother-text,rgba(238,244,240,.82))!important;
+  border-color:var(--white-a14);
+}
+html.theme-dark:has(.workspace) body .ws-trash-entry.active{
+  color:var(--home-shortcut-mother-text,rgba(238,244,240,.82))!important;
+  background:var(--home-shortcut-mother-control)!important;
+  border-color:var(--white-a14);
+}
+html.theme-dark:has(.workspace) body :is(.ws-newproj-input,.ws-create-input,.ws-card-title-input){
+  background:transparent!important;
+  border:0!important;
+  outline:0!important;
+  box-shadow:none;
+}
+@media (prefers-reduced-motion:reduce){
+  html.theme-dark:has(.workspace) body :is(.ws-card-pop,.ws-create-card,.ws-trash-card,.ws-newproj-row,.ws-project-confirm,.ws-card-delete-confirm,.ws-trash-confirm,.ws-status,.ws-card-rename,.ws-trash-act,.ws-confirm-btn,.ws-cancel-btn,.ws-card-delete-actions button,.ws-trash-confirm-actions button,.ws-project-confirm-actions button,.ws-pop-item,.ws-card-title-input){
+    transition:none!important;
+    animation:none!important;
+  }
+}
+html.theme-dark:has(.workspace){
+  --home-shortcut-mother-tool:var(--av-mother-tool);
+  --home-shortcut-mother-tool-hover:var(--av-mother-tool-hover);
+  --home-shortcut-mother-tool-shadow:var(--av-mother-tool-shadow);
+  --home-shortcut-mother-text:var(--av-mother-text);
+  --home-shortcut-mother-text-strong:var(--av-mother-text-strong);
+}
+
+/* HOME_MOTHER_GLASS_BACKDROP_20260808 (final authority for the launcher backdrop)
+   Frosted glass only reads as glass when the blur has structure to sample.
+   The launcher board now carries the same layered texture as the canvas shell,
+   and the scrolling world above it is fully transparent so that texture is what
+   every card, panel and dialog on this page actually refracts. */
+html.theme-dark:has(.workspace) body .launcher-board{
+  background-color:var(--av-space-00);
+  background-image:linear-gradient(rgba(255,255,255,.052) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(255,255,255,.052) 1px,transparent 1px),
+        linear-gradient(rgba(255,255,255,.020) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(255,255,255,.020) 1px,transparent 1px),
+        radial-gradient(ellipse 72% 58% at 50% 44%,var(--white-a4),transparent 70%),
+        radial-gradient(ellipse 56% 46% at 78% 16%,var(--white-a2),transparent 74%),
+        linear-gradient(138deg,#070809 0%,#0a0b0d 46%,#0f1012 74%,#070809 100%);
+  background-size:160px 160px,160px 160px,40px 40px,40px 40px,auto,auto,auto!important;
+  background-attachment:scroll;
+}
+html.theme-dark:has(.workspace) body .launcher-world{
+  background:none!important;
+  background-color:transparent;
+}
+/* The scrim used to pre-blur and wash out the board before the dialog's own
+   18px pass ever saw it, which is what made the glass read as flat plastic.
+   It now only dims for focus and leaves the texture intact. */
+html.theme-dark:has(.workspace) body .api-settings-modal{
+  background:rgba(3,7,8,.30)!important;
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
+}
+
+/* DRAG_GHOST_CARD_LAYOUT_20260820
+   The pointer-drag ghost is cloned from a launcher card and appended to
+   document.body, so the `.launcher-world`-scoped cover/card rules no longer
+   match. Reproduce that layout here (scoped to the ghost class) so the cover
+   thumbnail and card body render identically while following the pointer. */
+.ws-card-drag-ghost{
+  padding:0;
+  gap:0;
+  border:0;
+  outline:1px solid var(--av-mother-edge);
+  outline-offset:-1px;
+  background:var(--av-mother-surface)!important;
+  -webkit-backdrop-filter:var(--av-mother-panel-filter)!important;
+  backdrop-filter:var(--av-mother-panel-filter)!important;
+}
+.ws-card-drag-ghost .ws-card-cover{
+  position:relative;
+  flex:0 0 158px;
+  height:158px;
+  overflow:hidden;
+  border-bottom:1px solid var(--line);
+}
+.ws-card-drag-ghost .ws-card-cover-image{
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+.ws-card-drag-ghost .ws-card-cover-empty{
+  position:relative;
+  width:100%;
+  height:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.ws-card-drag-ghost .ws-card-cover-empty svg{
+  position:relative;
+  z-index:1;
+  width:28px;
+  height:28px;
+}
+.ws-card-drag-ghost .ws-card-menu{
+  position:absolute;
+  right:10px;
+  top:10px;
+  z-index:3;
+  margin:0;
+  width:26px;
+  height:26px;
+  flex:0 0 26px;
+}
+.ws-card-drag-ghost .ws-card-body{
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  flex:1 1 auto;
+  padding:13px 14px 14px;
+  gap:8px;
+}
+.ws-card-drag-ghost .ws-card-title-row{
+  display:flex;
+  align-items:flex-start;
+  gap:6px;
+  min-width:0;
+}
+.ws-card-drag-ghost .ws-card-title{
+  flex:1 1 auto;
+  min-width:0;
+  font-size:14px;
+  line-height:1.3;
+}
+.ws-card-drag-ghost .ws-card-rename{
+  width:26px;
+  height:26px;
+  flex:0 0 26px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  margin:-2px -3px 0 0;
+  padding:0;
+  opacity:.62;
+}
+.ws-card-drag-ghost .ws-card-meta{
+  margin-top:auto;
+  min-height:24px;
+  padding:0;
+  border:0;
+  border-radius:0;
+  background:transparent;
+  box-shadow:none;
+  font-size:11px;
+}
+.ws-card-drag-ghost .ws-card-meta-default{
+  min-width:0;
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+
+/* 首页按钮/徽标统一胶囊：顶级主操作、小图标按钮、确认操作按钮、项目行与回收站入口；卡片/菜单/输入框保持现状 */
+html.theme-dark:has(.workspace) body :is(
+  #homeNewCanvasBtn,
+  #homeImportCanvasBtn,
+  #pasteCanvasBtn,
+  #newProjectBtn,
+  .ws-icon-btn,
+  .ws-mini-btn,
+  .ws-proj-act,
+  .ws-card-menu,
+  .ws-card-rename,
+  .ws-trash-act,
+  .ws-confirm-btn,
+  .ws-cancel-btn,
+  .ws-card-delete-actions button,
+  .ws-trash-confirm-actions button,
+  .ws-project-confirm-actions button,
+  .ws-create-confirm,
+  .ws-create-cancel,
+  .ws-project-row,
+  .ws-trash-entry,
+  .api-settings-modal-close
+){
+  border-radius:var(--radius-full)!important;
+}

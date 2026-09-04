@@ -1,0 +1,42 @@
+无限智能画布使用说明
+
+一、启动
+1. 双击本目录的 run.bat。
+2. 程序使用本目录内置的 Python 3.10 环境启动，不需要另装 Python。
+3. 浏览器访问：http://127.0.0.1:3001/
+4. 停止程序：关闭启动窗口，或在窗口中按 Ctrl+C。
+
+二、迁移到另一台 Windows 电脑
+1. 先退出正在运行的无限智能画布。
+2. 完整复制“无限智能画布”文件夹到新电脑，盘符和上级目录可以不同。
+3. 在新电脑中双击 run.bat。
+4. 确认画布列表、素材图片和 API 平台设置均能正常显示。
+5. Windows 防火墙首次询问时，仅本机使用可只允许专用网络。
+
+三、迁移时必须保留
+- data\canvases：全部画布数据。
+- data\projects.json：项目列表。
+- data\asset_library.json：素材库索引。
+- data\prompt_libraries.json：提示词库。
+- data\api_providers.json：API 平台和模型配置。
+- assets：画布输入图、生成结果和素材库文件。
+- API\.env：API 地址、密钥等私密配置。
+- static：前端界面和当前自定义功能。
+- app、main.py 及根目录后端 Python 模块：后端程序。
+- python：内置运行环境。
+- run.bat、requirements.txt、VERSION、LICENSE。
+- history.json：历史生成记录。
+
+四、可以重新生成的目录
+- data\media_previews：图片和视频缩略图缓存；删除后会在使用时自动生成。
+- data\canvas_tasks：新生成任务的状态记录；当前为空，运行新任务后会自动写入。
+- Python 的 __pycache__：运行后可能重新出现，属于正常缓存。
+
+五、API 与隐私
+- API\.env 和 data\api_providers.json 可能包含密钥或访问凭据。
+- 迁移给自己的电脑时需要一并复制；不要发送给无关人员。
+- 如果新电脑上的 API 访问失败，先检查网络、密钥有效性和平台地址，不要重复提交状态不明的付费任务。
+
+六、当前目录说明
+- 本目录已清除测试文件、浏览器测试快照、旧备份、旧日志、一次性迁移脚本和离线安装包。
+- 不需要 output、tests、backup、backups、packages 或 workflows 目录即可运行。

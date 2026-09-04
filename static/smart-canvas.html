@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-studio-scale="off">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/static/images/logo.png" type="image/png">
+    <title data-i18n="smart.title">智能画布</title>
+    <script>
+        (function(){
+            document.documentElement.classList.add('studio-theme-dark', 'theme-dark');
+        })();
+    </script>
+    <script src="/static/vendor/js/lucide.js?v=2026.07.15.1786174994"></script>
+    <script src="/static/js/theme.js?v=2026.07.15.1786174994"></script>
+    <script src="/static/js/touch-mouse.js?v=2026.07.15.1786174994"></script>
+    <script src="/static/js/i18n.js?v=2026.07.15.1786872950"></script>
+<link rel="stylesheet" href="/static/css/variables.css?v=2026.07.15.1787984550">
+<link rel="stylesheet" href="/static/css/smart-canvas.css?v=2026.07.15.1788236301">
+<link rel="stylesheet" href="/static/css/button-glass.css?v=2026.07.15.1787984550">
+</head>
+<body>
+    <div id="shell" class="shell">
+        <div id="world" class="world"></div>
+        <div id="smartCanvasUiOverlay" class="smart-canvas-ui-overlay">
+        <div id="composer" class="composer">
+                <div class="composer-card">
+                    <div class="composer-head">
+                        <div class="composer-head-left">
+                            <div id="apiKindToggle" class="kind-toggle" style="display:none">
+                                <button type="button" data-kind="image" class="active"><i data-lucide="image"></i><span data-i18n="smart.kindImage">图片</span></button>
+                                <button type="button" data-kind="video"><i data-lucide="film"></i><span data-i18n="smart.kindVideo">视频</span></button>
+                            </div>
+                        </div>
+                        <div class="composer-head-right">
+                            <button id="composerFocusUpstreamBtn" disabled hidden aria-disabled="true" class="composer-template-btn composer-node-nav-btn" type="button" title="切换至上游节点" aria-label="切换至上游节点">
+                                <i data-lucide="corner-up-left"></i><span>上游节点</span>
+                            </button>
+                            <button id="composerCollapseBtn" class="composer-collapse-btn" type="button" title="展开编辑器" aria-label="展开编辑器" aria-expanded="false">
+                                <i data-lucide="x"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="inputThumbsRow" class="input-thumbs-row" aria-label="参考图"></div>
+                    <div id="inputPromptPreview" class="input-prompt-preview"></div>
+                    <div class="prompt-row">
+                        <div class="prompt-row-head">
+                            <div class="prompt-row-context-line">
+                                <span class="prompt-row-title">生成策略 · 提示词</span>
+                            </div>
+                            <div class="prompt-row-tools" aria-label="提示词工具">
+                                <div class="prompt-tool-group prompt-tool-group-primary" role="group" aria-label="提示词高频操作">
+                                    <button id="composerTemplateBtn" class="composer-template-btn" type="button" title="提示词库" aria-label="提示词库" data-i18n-title="smart.promptTemplateLibrary">
+                                        <i data-lucide="library"></i><span>提示词库</span>
+                                    </button>
+                                    <button id="composerCopyPromptBtn" disabled aria-disabled="true" class="composer-template-btn composer-copy-prompt-btn" type="button" title="复制提示词" aria-label="复制提示词">
+                                        <i data-lucide="copy"></i><span>复制</span>
+                                    </button>
+                                    <button id="composerPastePromptBtn" disabled aria-disabled="true" class="composer-template-btn composer-paste-prompt-btn" type="button" title="粘贴提示词" aria-label="粘贴提示词">
+                                        <i data-lucide="clipboard-paste"></i><span>粘贴</span>
+                                    </button>
+                                    <button id="composerClearPromptBtn" disabled aria-disabled="true" class="composer-template-btn composer-clear-prompt-btn" type="button" title="清空提示词" aria-label="清空提示词">
+                                        <i data-lucide="eraser"></i><span>清空</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="prompt-input-shell">
+                            <div id="promptInput" class="prompt-input" contenteditable="true" data-i18n-placeholder="smart.promptPlaceholder" data-placeholder="描述你想生成或编辑的图片..."></div>
+                            <button id="downstreamPromptLockBtn" class="downstream-prompt-lock" type="button" title="解锁提示词编辑" aria-label="解锁提示词编辑" hidden>
+                                <span class="downstream-prompt-lock-icon" aria-hidden="true">
+                                    <i class="downstream-prompt-lock-icon-closed" data-lucide="lock-keyhole"></i>
+                                    <i class="downstream-prompt-lock-icon-open" data-lucide="unlock-keyhole"></i>
+                                </span>
+                                <span class="downstream-prompt-lock-copy" aria-live="polite">
+                                    <span class="downstream-prompt-lock-copy-locked">
+                                        <span class="downstream-prompt-lock-title">下游节点提示词已锁定</span>
+                                        <span class="downstream-prompt-lock-hint">点击此处解锁编辑</span>
+                                    </span>
+                                    <span class="downstream-prompt-lock-copy-unlocked">
+                                        <span class="downstream-prompt-lock-title">已解锁</span>
+                                        <span class="downstream-prompt-lock-hint">可以编辑提示词</span>
+                                    </span>
+                                </span>
+                            </button>
+                        </div>
+                        <div id="mentionPicker" class="mention-picker"></div>
+                    </div>
+                    <div class="param-row">
+                        <div id="dynamicParams" class="dynamic-params"></div>
+                    </div>
+                    <div class="composer-actions">
+                        <div id="composerTaskStatusSlot" class="composer-task-status-slot" aria-live="polite"></div>
+                        <button id="runBtn" class="run-btn" type="button" data-av-interaction="top"><i data-lucide="sparkles"></i><span data-i18n="smart.run">运行</span></button>
+                    </div>
+            </div>
+        </div>
+        <div id="smartWorkspaceRail" class="smart-workspace-rail" aria-label="画布工作区">
+            <nav class="smart-workspace-navigation" aria-label="画布导航">
+                <button class="smart-back" type="button" data-av-interaction="top" data-smart-action="back-to-canvas-list" title="返回画布列表" aria-label="返回画布列表"><i data-lucide="arrow-left"></i><span data-i18n="canvas.backToList">返回画布列表</span></button>
+                <button id="smartCanvasSettingsBtn" class="smart-settings-btn" type="button" data-av-interaction="top" data-smart-action="open-settings" title="API 设置" aria-label="API 设置"><i data-lucide="key-round"></i><span>API 设置</span></button>
+            </nav>
+            <section id="smartCanvasContext" class="smart-canvas-context" aria-label="当前画布信息">
+                <div class="smart-canvas-context-main"><strong id="smartCanvasContextName">当前画布</strong></div>
+                <div class="smart-canvas-context-meta"><span id="smartCanvasNodeCount">0 个节点</span></div>
+            </section>
+            <div id="smartLeftUtilityCluster" class="smart-left-utility-cluster" aria-label="左侧画布工具">
+                <button id="assetToggle" class="asset-toggle" type="button" data-av-interaction="top" aria-expanded="false"><i data-lucide="library"></i><span data-i18n="smart.assetLibrary">资产库</span></button>
+                <button id="smartLogToggle" class="smart-log-toggle" type="button" data-av-interaction="top" data-smart-action="open-log" title="日志" aria-label="日志" aria-expanded="false" data-i18n-title="canvas.logs"><i data-lucide="list-todo"></i><span data-i18n="canvas.logs">日志</span></button>
+                <button id="smartShortcutToggle" class="smart-shortcut-toggle" type="button" data-av-interaction="top" data-smart-action="open-shortcuts" title="快捷键" aria-label="快捷键" aria-expanded="false"><i data-lucide="keyboard"></i><span>快捷键</span></button>
+            </div>
+        </div>
+        <div id="smartUtilityCluster" class="smart-utility-cluster" aria-label="右侧画布工具">
+            <div class="smart-utility-group smart-utility-group-surfaces" aria-label="画布工作面板">
+                <button id="smartChatToggle" class="smart-right-surface-toggle smart-chat-toggle" type="button" data-av-interaction="top" data-smart-action="toggle-chat" title="AI助手（W）" aria-label="AI助手" aria-keyshortcuts="W" aria-expanded="false"><i data-lucide="scan-eye"></i><span>AI助手</span></button>
+                <button id="smartComposerToggle" class="smart-right-surface-toggle smart-composer-toggle" type="button" data-av-interaction="top" data-smart-action="toggle-composer-surface" title="提示词工作台（F）" aria-label="提示词工作台" aria-keyshortcuts="F" aria-expanded="false"><i data-lucide="panel-right"></i><span>提示词工作台</span></button>
+            </div>
+            <div class="smart-utility-group smart-utility-group-agent" aria-label="Agent 状态">
+                <button id="smartAgentStatus" class="smart-agent-status" type="button" aria-label="Smart Canvas Agent 未连接" aria-live="polite"><span class="smart-agent-status-dot" aria-hidden="true"></span><i data-lucide="bot"></i><span id="smartAgentStatusText">Agent 未连接</span></button>
+            </div>
+        </div>
+        <div id="smartStatusRail" class="smart-status-rail" aria-label="画布状态">
+            <span id="smartTitle" class="smart-title" aria-live="polite" hidden></span>
+            <div id="smartSaveStatus" class="smart-save-status" role="status" aria-live="polite" hidden></div>
+            <div id="smartTaskStatus" class="smart-task-status" data-state="idle" role="status" aria-live="polite" hidden>
+                <span class="smart-task-dot" aria-hidden="true"></span><span id="smartTaskStatusText"></span>
+            </div>
+            <div id="toast" class="toast"></div>
+        </div>
+        <section id="smartCanvasEmptyState" class="smart-canvas-empty-state" hidden aria-label="画布起点">
+            <span class="smart-empty-origin">空白画布</span>
+            <h1>从素材或想法开始</h1>
+            <p>上传图片、视频或音频，也可以先创建一个空白节点。</p>
+            <div class="smart-empty-hint">右键画布可打开命令菜单</div>
+        </section><div id="createMenu" class="create-menu" role="dialog" aria-label="画布快捷菜单">
+            <div id="canvasCommandList" class="canvas-command-list" role="menu"></div>
+        </div>
+        <input id="fileInput" type="file" accept="image/*,video/*,audio/*" multiple hidden>
+        <div id="promptPresetPanel" class="prompt-preset-panel">
+            <div class="prompt-preset-panel-head">
+                <span>提示词预设</span>
+                <button id="promptPresetClose" type="button" title="关闭"><i data-lucide="x"></i></button>
+            </div>
+            <div id="promptPresetStatus" class="prompt-preset-status"></div>
+            <div class="prompt-preset-fields">
+                <select id="promptPresetSelect"></select>
+                <input id="promptPresetName" type="text" placeholder="预设名称">
+                <textarea id="promptPresetText" placeholder="预设内容"></textarea>
+            </div>
+            <div class="prompt-preset-actions">
+                <button id="promptPresetApply" type="button">应用</button>
+                <button id="promptPresetDelete" class="danger" type="button">删除</button>
+                <span style="flex:1"></span>
+                <button id="promptPresetNew" type="button">存为新预设</button>
+                <button id="promptPresetSave" class="primary" type="button" data-av-interaction="top">保存修改</button>
+            </div>
+        </div>
+        <div id="promptTemplatePanel" class="prompt-template-panel">
+            <div class="prompt-template-head">
+                <div>
+                    <strong>提示词模板库</strong>
+                    <span>内置标准库 + 我的预设</span>
+                </div>
+                <button id="promptTemplateClose" type="button" title="关闭"><i data-lucide="x"></i></button>
+            </div>
+            <select id="promptTemplateLibrarySelect" class="prompt-template-library-select" title="选择提示词库"></select>
+            <div class="prompt-template-search">
+                <i data-lucide="search"></i>
+                <input id="promptTemplateSearch" type="search" placeholder="搜索模板...">
+            </div>
+            <div id="promptTemplateCats" class="prompt-template-cats"></div>
+            <div id="promptTemplateBody" class="prompt-template-body"></div>
+        </div>
+        <aside id="smartCanvasNavigator" class="smart-canvas-navigator" aria-label="画布小地图">
+            <div id="minimap" class="smart-minimap" aria-hidden="true">
+                <div id="minimapContent" class="smart-minimap-content"><div id="minimapViewport" class="smart-minimap-viewport"></div></div>
+            </div>
+            <div id="smartViewportControls" class="smart-viewport-controls" aria-label="画布缩放">
+                <button id="smartZoomOutBtn" type="button" aria-label="缩小"><i data-lucide="minus"></i></button>
+                <button id="smartZoomLabel" class="smart-zoom-label" type="button" aria-label="恢复 100%">100%</button>
+                <button id="smartZoomInBtn" type="button" aria-label="放大"><i data-lucide="plus"></i></button>
+                <span class="smart-viewport-divider"></span>
+                <button id="smartShowAllBtn" type="button" aria-label="显示全部节点"><i data-lucide="scan"></i></button>
+                <button id="smartFocusSelectionBtn" type="button" aria-label="聚焦选中节点"><i data-lucide="focus"></i></button>
+            </div>
+        </aside>
+        <div id="smartSelectionDock" class="smart-selection-dock" hidden aria-label="选中节点工具条">
+            <span id="smartSelectionDockLabel" class="smart-selection-dock-label"></span>
+            <button type="button" data-selection-action="upstream"><i data-lucide="corner-up-left"></i><span>定位上游</span></button>
+            <button type="button" data-selection-action="edit-prompt"><i data-lucide="pencil-line"></i><span>编辑提示词</span></button>
+            <button type="button" data-selection-action="download"><i data-lucide="download"></i><span>下载</span></button>
+            <button type="button" data-selection-action="save-asset"><i data-lucide="library"></i><span>保存到资产库</span></button>
+            <button type="button" data-selection-action="query-task"><i data-lucide="refresh-cw"></i><span>查询失败任务</span></button>
+        </div>
+        <div id="smartCommandDock" class="smart-command-dock" role="toolbar" aria-label="画布命令工具条" data-native-title></div>
+        <aside id="assetPanel" class="asset-panel">
+            <div class="asset-head">
+                <div class="asset-heading-group">
+                    <div class="asset-title"><i data-lucide="library"></i><span data-i18n="smart.assetLibrary">资产库</span></div>
+                    <div class="asset-tabs">
+                        <button class="asset-tab active" type="button" data-asset-tab="image" data-i18n="smart.assetImages">图片资产</button>
+                    </div>
+                </div>
+                <button id="assetCloseBtn" class="asset-mini-btn" type="button" title="关闭" data-i18n-title="common.close"><i data-lucide="x"></i></button>
+            </div>
+            <div id="assetImageControls">
+                <div class="asset-select-shell asset-library-picker" data-asset-picker="library">
+                    <select id="assetLibrarySelect" class="asset-category-select asset-library-select asset-native-select" title="选择资产库" tabindex="-1" aria-hidden="true"></select>
+                    <button id="assetLibraryPickerButton" class="asset-select-trigger" type="button" aria-label="选择资产库" aria-haspopup="listbox" aria-expanded="false">
+                        <span class="asset-select-value">资产库</span><i data-lucide="chevron-down"></i>
+                    </button>
+                    <div id="assetLibraryPickerMenu" class="asset-select-menu" role="listbox" aria-label="资产库" hidden></div>
+                </div>
+                <div class="asset-category-row">
+                    <div class="asset-select-shell asset-category-picker" data-asset-picker="category">
+                        <select id="assetCategorySelect" class="asset-category-select asset-native-select" tabindex="-1" aria-hidden="true"></select>
+                        <button id="assetCategoryPickerButton" class="asset-select-trigger" type="button" aria-label="选择文件夹" aria-haspopup="listbox" aria-expanded="false">
+                            <span class="asset-select-value">文件夹</span><i data-lucide="chevron-down"></i>
+                        </button>
+                        <div id="assetCategoryPickerMenu" class="asset-select-menu" role="listbox" aria-label="文件夹" hidden></div>
+                    </div>
+                    <button id="assetAddCategoryBtn" class="asset-mini-btn" type="button" title="新建文件夹" data-i18n-title="smart.assetNewFolder"><i data-lucide="folder-plus"></i></button>
+                    <button id="assetRenameCategoryBtn" class="asset-mini-btn" type="button" title="重命名文件夹" data-i18n-title="smart.assetRenameFolder"><i data-lucide="pencil"></i></button>
+                </div>
+            </div>
+            <div id="assetDropZone" class="asset-drop-zone" data-i18n="smart.assetDropHint">把画布图片拖到这里保存到当前文件夹</div>
+            <input id="assetAddFilesInput" type="file" accept="image/*,video/*,audio/*" multiple hidden>
+            <div id="assetGrid" class="asset-grid"></div>
+        </aside>
+        <aside id="smartChatPanel" class="smart-chat-panel" aria-label="AI助手工具卡" aria-hidden="true">
+            <header class="smart-chat-panel-head">
+                <div class="smart-chat-panel-heading">
+                    <span class="smart-chat-panel-icon"><i data-lucide="scan-eye"></i></span>
+                    <div><strong id="smartChatPanelTitle">AI助手</strong><span id="smartChatPanelMeta">看懂图片 · 优化提示词 · 不自动生成</span></div>
+                </div>
+                <div class="smart-chat-panel-head-actions">
+                    <button type="button" data-smart-action="new-chat" title="新建对话" aria-label="新建对话"><i data-lucide="plus"></i></button>
+                    <button type="button" data-smart-action="close-chat" title="关闭" aria-label="关闭"><i data-lucide="x"></i></button>
+                </div>
+            </header>
+            <div id="smartChatPanelBody" class="smart-chat-panel-body"></div>
+        </aside>
+        <div id="assetDialogBackdrop" class="asset-dialog-backdrop" hidden>
+            <div class="asset-dialog">
+                <div class="asset-dialog-title"><i data-lucide="folder-pen"></i><span id="assetDialogTitle">命名</span></div>
+                <textarea id="assetDialogInput" class="asset-dialog-input" rows="1" autocomplete="off"></textarea>
+                <div class="asset-dialog-actions">
+                    <button id="assetDialogCancel" class="asset-dialog-btn secondary" type="button" data-i18n="common.cancel">取消</button>
+                    <button id="assetDialogOk" class="asset-dialog-btn primary" type="button" data-av-interaction="top" data-i18n="common.confirm">确定</button>
+                </div>
+            </div>
+        </div>
+        <div id="selectionBox" class="selection-box"></div>
+        <div id="smartLogModal" class="log-modal" data-smart-action="close-log">
+            <div class="log-panel" data-smart-stop="1">
+                <div class="log-head">
+                    <div class="log-heading"><div class="log-title" data-i18n="canvas.generationLogs">生成日志</div><div id="smartLogSummary" class="log-summary" aria-live="polite"></div></div>
+                    <div class="log-head-actions">
+                        <button class="preview-icon-btn" type="button" data-smart-action="scroll-log-top" title="回到顶部" aria-label="回到顶部"><i data-lucide="arrow-up" class="w-4 h-4"></i></button>
+                        <button class="preview-icon-btn" type="button" data-smart-action="close-log" title="关闭" data-i18n-title="common.close"><i data-lucide="x" class="w-4 h-4"></i></button>
+                    </div>
+                </div>
+                <div id="smartLogList" class="log-list"></div>
+            </div>
+        </div>
+<div id="smartShortcutModal" class="shortcut-modal" data-smart-action="close-shortcuts" data-smart-stop="1">
+                <div class="shortcut-head"><div class="shortcut-title"><i data-lucide="keyboard"></i><span>快捷键与手势</span></div><button class="preview-icon-btn" type="button" data-smart-action="close-shortcuts" title="关闭"><i data-lucide="x" class="w-4 h-4"></i></button></div>
+                <div id="smartShortcutList" class="shortcut-list"></div>
+        </div>
+        <div id="mediaPreviewModal" class="media-preview-modal" role="dialog" aria-modal="true" aria-label="图片放大预览">
+            <div class="media-preview-panel image-preview-panel">
+                <div id="previewStage" class="image-preview-stage">
+                    <div class="preview-image-frame">
+                        <button id="previewPrevBtn" class="preview-icon-btn preview-nav-btn" type="button" title="上一张" aria-label="上一张" hidden><i data-lucide="chevron-left"></i></button>
+                        <div id="previewMediaHost" class="preview-media-host"></div>
+                        <div id="previewResolution" class="preview-resolution" hidden></div>
+                        <div id="previewNavHint" class="preview-nav-hint" hidden>多图：键盘左右键切换</div>
+                        <div class="image-preview-top-actions">
+                            <button id="previewLocateBtn" class="preview-icon-btn" type="button" title="定位节点" aria-label="定位节点"><i data-lucide="locate-fixed"></i></button>
+                            <button id="previewDownloadBtn" class="preview-icon-btn" type="button" data-smart-action="download-preview" title="下载" aria-label="下载"><i data-lucide="download"></i></button>
+                            <button id="previewCloseBtn" class="preview-icon-btn" type="button" title="关闭" aria-label="关闭"><i data-lucide="x"></i></button>
+                        </div>
+                        <button id="previewNextBtn" class="preview-icon-btn preview-nav-btn" type="button" title="下一张" aria-label="下一张" hidden><i data-lucide="chevron-right"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="mentionPreview" class="mention-preview"><img alt="preview"></div>
+        </div>
+        <div id="smartCanvasApiSettingsModal" class="smart-canvas-api-settings-modal" hidden>
+            <section class="smart-canvas-api-settings-modal-card" role="dialog" aria-modal="true" aria-labelledby="smartCanvasApiSettingsTitle">
+                <header class="smart-canvas-api-settings-modal-head">
+                    <div class="smart-canvas-api-settings-modal-title"><i data-lucide="key-round"></i><span id="smartCanvasApiSettingsTitle">API 设置</span></div>
+                    <div class="smart-canvas-api-settings-modal-actions"><span id="smartCanvasApiSettingsStatus" class="smart-canvas-api-settings-modal-status" role="status" aria-live="polite"></span><button id="smartCanvasApiSettingsClose" class="smart-canvas-api-settings-modal-close" type="button" title="关闭" aria-label="关闭"><i data-lucide="x"></i></button></div>
+                </header>
+                <iframe id="smartCanvasApiSettingsFrame" class="smart-canvas-api-settings-modal-frame" title="API 设置"></iframe>
+            </section>
+        </div>
+    </div>
+    <script src="/static/js/smart-canvas-model.js?v=2026.07.15.1786174994"></script>
+    <script src="/static/js/smart-canvas-viewport.js?v=2026.07.15.1786174994"></script>
+    <script src="/static/js/smart-canvas-connections.js?v=2026.07.15.1786174994"></script>
+    <script src="/static/js/smart-canvas-selection.js?v=2026.07.15.1786174994"></script>
+    <script src="/static/js/smart-canvas-node-view.js?v=2026.07.15.1786174994"></script>
+    <script src="/static/js/smart-canvas-node-render.js?v=2026.07.15.1786174994"></script>
+    <script src="/static/js/smart-canvas-node-renderers.js?v=2026.07.15.1786174994"></script>
+<script src="/static/js/smart-canvas-media-preview.js?v=2026.07.15.1786174994"></script>
+<script src="/static/js/smart-canvas-media-layout.js?v=2026.07.15.1786856294"></script>
+<script src="/static/js/smart-canvas-node-geometry.js?v=2026.07.15.1786174994"></script>
+<script src="/static/js/smart-canvas-node-sizing.js?v=2026.07.15.1786174994"></script>
+<script src="/static/js/smart-canvas-performance.js?v=2026.07.15.1786174994"></script>
+<script src="/static/js/smart-canvas-storage.js?v=2026.07.15.1787291932"></script>
+<script src="/static/js/smart-canvas-run-data.js?v=2026.07.15.1786174994"></script>
+<script src="/static/js/smart-canvas-generation-run.js?v=2026.07.15.1786174994"></script>
+<script src="/static/js/smart-canvas-node-render-pipeline.js?v=2026.07.15.1786174994"></script>
+    <script src="/static/js/smart-canvas-node-interactions.js?v=2026.07.15.1786174994"></script>
+    <script src="/static/js/smart-canvas-renderers/smart-image-renderer.js?v=2026.07.15.1786174994"></script>
+<script src="/static/js/smart-canvas-core.js?v=2026.07.15.1787291932"></script>
+    <script src="/static/js/smart-canvas-state.js?v=2026.07.15.1786174994"></script>
+<script src="/static/js/smart-canvas-upload-client.js?v=2026.07.15.1786174994"></script>
+    <script src="/static/js/smart-canvas-persistence-client.js?v=2026.07.15.1787291932"></script>
+    <script src="/static/js/smart-canvas-http-error.js?v=2026.07.15.1786856294"></script>
+    <script src="/static/js/smart-canvas-config-client.js?v=2026.07.15.1786856294"></script>
+    <script src="/static/js/smart-canvas-provider-catalog.js?v=2026.07.15.1786174994"></script>
+    <script src="/static/js/smart-canvas-size.js?v=2026.07.15.1786174994"></script>
+    <script src="/static/js/smart-canvas-parameter-view.js?v=2026.07.15.1786174994"></script>
+    <script src="/static/js/smart-canvas-parameter-controller.js?v=2026.07.15.1786174994"></script>
+    <script src="/static/js/smart-canvas-parameter-bindings.js?v=2026.07.15.1786174994"></script>
+    <script src="/static/js/smart-canvas-composer.js?v=2026.07.15.1786174994"></script>
+<script src="/static/js/smart-canvas-tasks.js?v=2026.07.15.1786174994"></script>
+<script src="/static/js/smart-canvas-task-client.js?v=2026.07.15.1786856294"></script>
+<script src="/static/js/smart-canvas-generation-client.js?v=2026.07.15.1786856294"></script>
+<script src="/static/js/smart-canvas-asset-client.js?v=2026.07.15.1786856294"></script>
+    <script src="/static/js/smart-canvas-actions.js?v=2026.07.15.1786174994"></script>
+    <script src="/static/js/smart-canvas-prompt-library-client.js?v=2026.07.15.1786856294"></script>
+<script src="/static/js/glass-interaction.js?v=2026.07.15.1786174994"></script>
+    <script src="/static/js/modules/event-manager.js?v=2026.07.15.1788146404"></script>
+<script src="/static/js/modules/ui-utils.js?v=2026.07.15.1786891976"></script>
+<script src="/static/js/smart-canvas-shortcuts.js?v=2026.07.15.1787886196"></script>
+<script src="/static/js/smart-canvas-command-menu-view.js?v=2026.07.15.1786891976"></script>
+<script src="/static/js/smart-canvas-log-view.js?v=2026.07.15.1787812961"></script>
+<script src="/static/js/smart-canvas-prompt-workbench-view.js?v=2026.07.15.1786891976"></script>
+<script src="/static/js/smart-canvas-asset-library-view.js?v=2026.07.15.1787621170"></script>
+<script src="/static/js/smart-canvas-visual-assistant-view.js?v=2026.07.15.1787905450"></script>
+<script src="/static/js/smart-canvas-preview-quality.js?v=2026.07.15.1788146404"></script>
+<script type="module" src="/static/js/smart-canvas.js?v=2026.07.15.1788229194"></script>
+<script src="/static/js/smart-canvas-agent-bridge.js?v=2026.07.15.1788146404"></script>
+</body>
+</html>

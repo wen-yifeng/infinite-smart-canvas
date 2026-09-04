@@ -1,0 +1,67 @@
+# 凭证：文件保留在原位，只是不进入版本库
+API/.env
+
+# 用户数据与生成产物：体积大、变动频繁，由本地备份而非 git 管理
+assets/
+data/
+output/
+history.json
+
+# 内嵌 Python 运行时
+python/
+
+# 历史备份目录（git 接入后不再新增内容）
+backups/
+
+# 工具与临时产物
+.playwright-cli/
+.tmp-glass-verify/
+.zcode/
+__pycache__/
+*.pyc
+
+# 历史手工备份文件
+*.bak
+*.bak-*
+*.backup
+*.backup-*
+*.moved-*
+_tmp_patch.diff
+
+# 前端测试依赖与产物
+node_modules/
+test-results/
+playwright-report/
+
+# CSS 视觉回归黄金快照（capture-golden.ps1 生成，体积大且可再生）
+docs/refactoring/golden/*.json
+
+# 本地 AI 工作日志与计划（WorkBuddy 生成，不入库）
+.workbuddy/
+
+# 本地调试与运行产物
+blur.png
+deep_selectors.json
+deep_selectors_real.json
+global_config.json
+
+# 内部工作文档：保留在本地磁盘，不进入公开版本库
+AGENTS.md
+全局复利与踩坑日志.md
+UI视觉系统.md
+docs/archive/
+docs/ui-issues/
+
+# 内部开发文档与工具：仅本地使用，不进入公开仓库
+PRODUCT.md
+docs/
+tools/
+tests/
+package.json
+package-lock.json
+playwright.config.js
+pytest.ini
+stylelint.config.mjs
+
+# README 截图：以 Release 资产引用，仓库内不保留图片文件
+screenshots/
